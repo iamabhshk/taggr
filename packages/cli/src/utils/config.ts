@@ -1,0 +1,80 @@
+import fs from 'fs-extra';
+import path from 'path';
+import os from 'os';
+import type { TaggrConfig } from '../types.js';
+
+const CONFIG_DIR = path.join(os.homedir(), '.taggr');
+const CONFIG_FILE = path.join(CONFIG_DIR, 'config.json');
+
+const DEFAULT_API_URL = 'http://localhost:5000/api';
+
+/**
+ * Ensure config directory exists
+ */
+async function ensureConfigDir(): Promise<void> {
+  await fs.ensureDir(CONFIG_DIR);
+}
+
+/**
+ * Get the current configuration
+ */
+export async function getConfig(): Promise<TaggrConfig | null> {
+  try {
+    await ensureConfigDir();
+    
+    if (await fs.pathExists(CONFIG_FILE)) {
+      const config = await fs.readJson(CONFIG_FILE);
+      return {
+        apiKey: config.apiKey || '',
+        apiUrl: config.apiUrl || DEFAULT_API_URL,
+      };
+    }
+    
+    return null;
+  } catch (error) {
+    return null;
+  }
+}
+
+/**
+ * Save configuration
+ */
+export async function saveConfig(config: Partial<TaggrConfig>): Promise<void> {
+  await ensureConfigDir();
+  
+  const existingConfig = await getConfig() || { apiKey: '', apiUrl: DEFAULT_API_URL };
+  const newConfig = { ...existingConfig, ...config };
+  
+  await fs.writeJson(CONFIG_FILE, newConfig, { spaces: 2 });
+}
+
+/**
+ * Delete configuration (logout)
+ */
+export async function deleteConfig(): Promise<void> {
+  if (await fs.pathExists(CONFIG_FILE)) {
+    await fs.remove(CONFIG_FILE);
+  }
+}
+
+/**
+ * Check if user is logged in
+ */
+export async function isLoggedIn(): Promise<boolean> {
+  const config = await getConfig();
+  return config !== null && !!config.apiKey;
+}
+
+/**
+ * Get API key or throw if not logged in
+ */
+export async function requireAuth(): Promise<TaggrConfig> {
+  const config = await getConfig();
+  
+  if (!config || !config.apiKey) {
+    throw new Error('Not logged in. Run "taggr login <API_KEY>" first.');
+  }
+  
+  return config;
+}
+
