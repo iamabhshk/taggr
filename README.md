@@ -2,332 +2,178 @@
 
 > **Create Once, Use Everywhere**
 
-Taggr is a private, user-owned label management system that allows developers to create, manage, and distribute custom text labels as npm packages across all their projects. Inspired by Salesforce's custom labels feature, Taggr maintains a single source of truth for your label ecosystem.
+Taggr is a private, user-owned label management system that allows developers to create, manage, and distribute custom text labels across all their projects. Inspired by Salesforce's custom labels feature, Taggr maintains a single source of truth for your label ecosystem.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)
 
-## Table of Contents
+## What is Taggr?
 
-- [Features](#features)
-- [Architecture](#architecture)
-- [Technology Stack](#technology-stack)
-- [Getting Started](#getting-started)
-- [Project Structure](#project-structure)
-- [Development](#development)
-- [Deployment](#deployment)
-- [API Documentation](#api-documentation)
-- [Contributing](#contributing)
-- [License](#license)
+Taggr helps you manage all your application labels (text strings, messages, UI copy) in one central place. Instead of hardcoding text throughout your codebase, you can:
+
+- **Create labels** with categories and tags for easy organization
+- **Manage versions** with semantic versioning and changelogs
+- **Pull labels** directly into your projects using the CLI
+- **Collaborate** with your team through workspaces
+- **Track usage** with analytics on how often labels are used
 
 ## Features
 
-- ✅ **Private Label Management** - Each user's labels are completely private and secure
-- ✅ **npm Package Distribution** - Auto-publish labels as npm packages
-- ✅ **Version Control** - Semantic versioning with changelog support
-- ✅ **Beautiful UI** - Modern, responsive interface with Chakra UI
-- ✅ **Dark Mode** - Full dark mode support
-- ✅ **Real-time Search** - Search and filter labels instantly
-- ✅ **Import/Export** - Bulk operations for label management
-- ✅ **Firebase Authentication** - Secure user authentication
-- ✅ **RESTful API** - Well-documented API endpoints
-- ✅ **Production Ready** - Built with scalability and security in mind
+### 🔒 Private Label Management
+Each user's labels are completely private and secure. Your labels are only accessible to you unless you explicitly share them through workspaces. All data is encrypted and stored securely.
 
-## Architecture
+### 🖥️ CLI Tool
+Pull labels directly into your project using our command-line interface. No need to manually copy-paste or maintain separate files. Simply run `taggr pull --all` and your labels are ready to use in your codebase.
 
-Taggr follows a modern client-server architecture:
+### 📦 Version Control
+Track changes to your labels with semantic versioning (major.minor.patch). Each version includes a changelog, so you can see exactly what changed and when. Perfect for maintaining consistency across deployments.
 
+### 🎨 Beautiful UI
+Modern, responsive interface built with Material-UI. Intuitive design makes it easy to create, edit, and manage hundreds of labels without getting lost. Clean, professional interface that works on all devices.
+
+### 🌙 Dark Mode
+Full dark mode support for comfortable late-night coding sessions. Automatically syncs with your system preferences or can be toggled manually.
+
+### 🔍 Real-time Search
+Search and filter labels instantly by name, category, or tags. Find exactly what you need in milliseconds, even with thousands of labels. Debounced search ensures smooth performance.
+
+### 📥 Import/Export
+Bulk operations for efficient label management. Import labels from JSON files or export your entire label collection for backup or migration. Perfect for onboarding new team members or migrating between projects.
+
+### 🔐 Firebase Authentication
+Secure user authentication powered by Firebase. Support for email/password and Google Sign-In. All authentication is handled securely with industry-standard practices.
+
+### 👥 Team Workspaces
+Collaborate with team members through shared workspaces. Invite team members with different permission levels (Owner, Admin, Editor, Viewer). All workspace members can access and manage shared labels together.
+
+### 📊 Usage Analytics
+Track how often your labels are used via CLI pulls. See which labels are most popular and identify unused labels that can be cleaned up. Analytics help you understand your label usage patterns.
+
+### 🔑 Token Management
+Generate secure API tokens for CLI access. Each token can be named and managed independently. Regenerate tokens anytime for security, and revoke tokens you no longer need.
+
+### 🏷️ Categories & Tags
+Organize labels with categories and tags for easy navigation. Filter by category or search by tags to quickly find related labels. Perfect for large projects with hundreds of labels.
+
+### 📝 Rich Metadata
+Add descriptions, categories, and tags to each label for better organization. Metadata helps team members understand the context and purpose of each label.
+
+### 🚀 Production Ready
+Built with scalability and security in mind. Handles thousands of labels efficiently, with proper error handling, rate limiting, and security best practices. Ready for production use from day one.
+
+## Quick Start
+
+### 1. Create an Account
+
+Sign up at the Taggr web application to get started.
+
+### 2. Generate a Token
+
+1. Navigate to the **Tokens** section in your dashboard
+2. Click **Generate New Token**
+3. Give it a name (e.g., "My Development Token")
+4. Copy the token immediately - you won't be able to see it again!
+
+### 3. Install the CLI
+
+```bash
+npm install -g @taggr/cli
 ```
-┌──────────────────────────────────────┐
-│         Frontend (React)             │
-│   - Chakra UI for components         │
-│   - TanStack Query for data fetching │
-│   - Zustand for state management     │
-└──────────────────────────────────────┘
-                  ↓
-┌──────────────────────────────────────┐
-│      Backend API (Express)           │
-│   - RESTful endpoints                │
-│   - Firebase Admin SDK               │
-│   - Input validation with Zod        │
-└──────────────────────────────────────┘
-                  ↓
-┌──────────────────────────────────────┐
-│          Data Layer                  │
-│   - MongoDB (labels & users)         │
-│   - Firebase Auth (authentication)   │
-│   - npm Registry (distribution)      │
-└──────────────────────────────────────┘
+
+### 4. Login with Your Token
+
+```bash
+taggr login <your-token>
 ```
 
-## Technology Stack
+### 5. Pull Your Labels
 
-### Frontend
-- **Framework**: React 18+ with TypeScript
-- **UI Library**: Chakra UI
-- **State Management**: TanStack Query + Zustand
-- **Routing**: React Router v6
-- **Build Tool**: Vite
-- **Testing**: Vitest + React Testing Library
+```bash
+taggr pull --all
+```
 
-### Backend
-- **Runtime**: Node.js 18+
-- **Framework**: Express.js with TypeScript
-- **Database**: MongoDB with Mongoose ODM
-- **Authentication**: Firebase Admin SDK
-- **Validation**: Zod
-- **Logging**: Winston
-- **Testing**: Jest + Supertest
+This creates a `./taggr` folder in your project with:
+- `labels.json` - All your labels in one file
+- `labels.d.ts` - TypeScript definitions for autocomplete
 
-### Infrastructure
-- **Frontend Deployment**: Vercel
-- **Backend Deployment**: Railway/Render
-- **Database Hosting**: MongoDB Atlas
-- **Authentication**: Firebase (managed)
-- **CI/CD**: GitHub Actions
+### 6. Use in Your Code
 
-## Getting Started
+```javascript
+import labels from './taggr/labels.json';
 
-### Prerequisites
+console.log(labels.welcomeMessage);
+console.log(labels.submitButton);
 
-- Node.js 18+ and npm
-- MongoDB (local or Atlas)
-- Firebase project with Admin SDK credentials
-- npm account (for package publishing)
+// Or destructure what you need
+const { myLabel, submitButton } = labels;
+```
 
-### Installation
+## How It Works
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/taggr.git
-   cd taggr
-   ```
+### Creating Labels
 
-2. **Install dependencies**
-   ```bash
-   # Install frontend dependencies
-   cd frontend
-   npm install
+1. Log in to your Taggr dashboard
+2. Click **Create Label**
+3. Fill in:
+   - **Name** (kebab-case, e.g., `welcome-message`)
+   - **Display Name** (human-readable, e.g., "Welcome Message")
+   - **Value** (the actual text content)
+   - **Category** (optional, for organization)
+   - **Tags** (optional, for filtering)
 
-   # Install backend dependencies
-   cd ../backend
-   npm install
-   ```
+### Managing Labels
 
-3. **Configure environment variables**
+- **Search** - Use the search bar to find labels by name or content
+- **Filter** - Filter by category or tags
+- **Edit** - Click any label to edit its value
+- **Delete** - Remove labels you no longer need
 
-   **Frontend** (`frontend/.env`):
-   ```env
-   VITE_FIREBASE_API_KEY=your_firebase_api_key
-   VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-   VITE_FIREBASE_PROJECT_ID=your_project_id
-   VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-   VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-   VITE_FIREBASE_APP_ID=your_app_id
-   VITE_API_URL=http://localhost:5000/api
-   ```
+### Team Collaboration
 
-   **Backend** (`backend/.env`):
-   ```env
-   NODE_ENV=development
-   PORT=5000
-   DATABASE_URL=mongodb://localhost:27017/taggr
-   FIREBASE_PROJECT_ID=your_project_id
-   FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
-   FIREBASE_CLIENT_EMAIL=firebase-adminsdk@your_project.iam.gserviceaccount.com
-   JWT_SECRET=your_secret_key
-   NPM_AUTH_TOKEN=your_npm_token
-   CORS_ORIGIN=http://localhost:3000
-   ```
+1. Create a **Workspace** from the Team section
+2. **Invite members** by email with roles:
+   - **Owner** - Full control
+   - **Admin** - Can manage members and labels
+   - **Editor** - Can create and edit labels
+   - **Viewer** - Read-only access
+3. All workspace members can access shared labels
 
-4. **Start development servers**
-   ```bash
-   # Terminal 1 - Backend
-   cd backend
-   npm run dev
+### CLI Commands
 
-   # Terminal 2 - Frontend
-   cd frontend
-   npm run dev
-   ```
+```bash
+# Check which account you're logged in as
+taggr whoami
 
-5. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:5000
-   - API Health: http://localhost:5000/api/health
+# List all your labels
+taggr list
+
+# Pull all labels to your project
+taggr pull --all
+
+# Pull a specific label
+taggr pull <label-name>
+
+# Logout
+taggr logout
+```
 
 ## Project Structure
 
 ```
 taggr/
-├── frontend/                 # React frontend application
-│   ├── src/
-│   │   ├── components/      # Reusable UI components
-│   │   │   ├── auth/        # Authentication components
-│   │   │   ├── common/      # Common components (Navbar, Sidebar)
-│   │   │   └── labels/      # Label-specific components
-│   │   ├── pages/           # Page components
-│   │   ├── services/        # API and Firebase services
-│   │   ├── stores/          # Zustand state stores
-│   │   ├── hooks/           # Custom React hooks
-│   │   ├── types/           # TypeScript type definitions
-│   │   ├── utils/           # Utility functions
-│   │   ├── styles/          # Theme and global styles
-│   │   ├── App.tsx          # Main app component
-│   │   └── main.tsx         # Application entry point
-│   ├── package.json
-│   └── vite.config.ts
-│
-├── backend/                  # Express backend API
-│   ├── src/
-│   │   ├── controllers/     # Route controllers
-│   │   ├── models/          # Mongoose models
-│   │   ├── routes/          # API routes
-│   │   ├── middleware/      # Express middleware
-│   │   ├── services/        # Business logic services
-│   │   ├── config/          # Configuration files
-│   │   ├── utils/           # Utility functions
-│   │   ├── types/           # TypeScript type definitions
-│   │   ├── app.ts           # Express app setup
-│   │   └── server.ts        # Server entry point
-│   ├── package.json
-│   └── tsconfig.json
-│
-├── .gitignore
-├── .prettierrc
-├── README.md
-└── taggr-architecture.pdf    # Complete architecture documentation
+├── frontend/          # React frontend application
+├── backend/           # Express backend API
+└── packages/
+    └── cli/           # CLI tool for pulling labels
 ```
 
-## Development
+## Technology Stack
 
-### Available Scripts
-
-**Frontend**:
-```bash
-npm run dev      # Start development server
-npm run build    # Build for production
-npm run preview  # Preview production build
-npm run lint     # Run ESLint
-npm run format   # Format code with Prettier
-```
-
-**Backend**:
-```bash
-npm run dev      # Start development server with hot reload
-npm run build    # Compile TypeScript
-npm start        # Start production server
-npm run lint     # Run ESLint
-npm run format   # Format code with Prettier
-npm test         # Run tests
-```
-
-### Code Quality
-
-The project uses:
-- **ESLint** for code linting
-- **Prettier** for code formatting
-- **TypeScript** for type safety
-- **Husky** for git hooks (optional)
-
-### Testing
-
-```bash
-# Frontend
-cd frontend
-npm test
-
-# Backend
-cd backend
-npm test
-```
-
-## Deployment
-
-### Frontend (Vercel)
-
-1. Push code to GitHub
-2. Connect repository to Vercel
-3. Configure environment variables
-4. Deploy automatically on push to main
-
-### Backend (Railway/Render)
-
-1. Push code to GitHub
-2. Connect repository to Railway/Render
-3. Configure environment variables
-4. Set build command: `npm run build`
-5. Set start command: `npm start`
-
-### Database (MongoDB Atlas)
-
-1. Create MongoDB Atlas cluster
-2. Configure network access
-3. Create database user
-4. Copy connection string to `DATABASE_URL`
-
-## API Documentation
-
-### Authentication Endpoints
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/auth/signup` | Register new user | No |
-| POST | `/api/auth/logout` | Logout user | No |
-| GET | `/api/auth/me` | Get current user | Yes |
-
-### Label Endpoints
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/api/labels` | Get all labels | Yes |
-| POST | `/api/labels` | Create new label | Yes |
-| GET | `/api/labels/:id` | Get single label | Yes |
-| PATCH | `/api/labels/:id` | Update label | Yes |
-| DELETE | `/api/labels/:id` | Delete label | Yes |
-| POST | `/api/labels/:id/publish` | Publish to npm | Yes |
-| GET | `/api/labels/:id/versions` | Get version history | Yes |
-| GET | `/api/labels/search` | Search labels | Yes |
-| POST | `/api/labels/bulk/export` | Export all labels | Yes |
-| POST | `/api/labels/bulk/import` | Import labels | Yes |
-
-### User Endpoints
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/api/users/profile` | Get user profile | Yes |
-| PATCH | `/api/users/profile` | Update profile | Yes |
-| GET | `/api/users/stats` | Get user statistics | Yes |
-| DELETE | `/api/users/account` | Delete account | Yes |
-
-For detailed API documentation, see the [API Specifications](./docs/api-specs.md) (in production, use Swagger UI).
-
-## Usage Example
-
-### Creating and Using a Label
-
-1. **Create a label in Taggr**:
-   ```
-   Name: work-status
-   Display Name: Work Status
-   Value: "You are currently working"
-   Category: status
-   Tags: ["work", "status"]
-   ```
-
-2. **Publish to npm** (generates package `@username/work-status`)
-
-3. **Install in your project**:
-   ```bash
-   npm install @username/work-status
-   ```
-
-4. **Use in your code**:
-   ```javascript
-   import label from '@username/work-status';
-   console.log(label.value); // "You are currently working"
-   ```
+- **Frontend**: React 18+ with TypeScript, Material-UI
+- **Backend**: Express.js with TypeScript, MongoDB
+- **Authentication**: Firebase
+- **CLI**: TypeScript, npm package
 
 ## Contributing
 
@@ -342,10 +188,6 @@ We welcome contributions! Please follow these steps:
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-For support, email support@taggr.dev or open an issue on GitHub.
 
 ## Acknowledgments
 
