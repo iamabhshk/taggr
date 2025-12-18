@@ -8,6 +8,7 @@ import {
   Box,
   IconButton,
   useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
@@ -40,6 +41,7 @@ const LabelModal = ({ isOpen, onClose, label }: LabelModalProps) => {
   const queryClient = useQueryClient();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   // Populate form when editing
   useEffect(() => {
@@ -159,20 +161,23 @@ const LabelModal = ({ isOpen, onClose, label }: LabelModalProps) => {
     <Dialog
       open={isOpen}
       onClose={onClose}
-      maxWidth="md"
+      maxWidth={isMobile ? 'sm' : 'lg'}
       fullWidth
       PaperProps={{
         component: motion.div,
         initial: { opacity: 0, scale: 0.9, y: 20 },
         animate: { opacity: 1, scale: 1, y: 0 },
-        exit: { opacity: 0, scale: 0.9, y: 20 },
         transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] },
         sx: {
           background: modalBg,
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           border: `1px solid ${borderColor}`,
-          borderRadius: '16px',
+          borderRadius: isMobile ? 0 : '16px',
+          m: isMobile ? 0 : 2,
+          maxHeight: isMobile ? '100vh' : '95vh',
+          width: isMobile ? '100%' : 'auto',
+          minWidth: isMobile ? '100%' : 720,
           boxShadow: isDark
             ? '0 20px 60px rgba(0, 0, 0, 0.5)'
             : '0 20px 60px rgba(37, 99, 235, 0.15)',
@@ -188,13 +193,14 @@ const LabelModal = ({ isOpen, onClose, label }: LabelModalProps) => {
     >
       <DialogTitle
         sx={{
-          fontSize: '1.5rem',
+          fontSize: { xs: '1.25rem', sm: '1.5rem' },
           fontWeight: 'bold',
           background: 'linear-gradient(135deg, #2563EB, #3B82F6)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text',
-          pr: 6,
+          pr: { xs: 5, sm: 6 },
+          pt: { xs: 2, sm: 3 },
         }}
       >
         {label ? 'Edit Label' : 'Create Label'}
@@ -206,22 +212,33 @@ const LabelModal = ({ isOpen, onClose, label }: LabelModalProps) => {
           right: 8,
           top: 8,
           borderRadius: '50%',
-          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: 'background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
           '&:hover': {
-            transform: 'rotate(90deg) scale(1.1)',
             backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(37, 99, 235, 0.1)',
           },
         }}
       >
         <CloseIcon />
       </IconButton>
-      <DialogContent>
+      <DialogContent
+        sx={{
+          px: { xs: 2, sm: 3 },
+          pt: { xs: 1, sm: 2 },
+          pb: { xs: 1.5, sm: 2 },
+          maxHeight: isMobile ? 'calc(100vh - 170px)' : 'calc(100vh - 200px)',
+          overflowY: 'auto',
+        }}
+      >
         <MotionBox
-          component="form"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
-          sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 2 }}
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 3,
+            pt: 1,
+          }}
         >
           <TextField
             required
@@ -366,9 +383,18 @@ const LabelModal = ({ isOpen, onClose, label }: LabelModalProps) => {
         </MotionBox>
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 2 }}>
+      <DialogActions
+        sx={{
+          px: { xs: 2, sm: 3 },
+          pb: { xs: 2, sm: 2.5 },
+          flexDirection: { xs: 'column-reverse', sm: 'row' },
+          alignItems: { xs: 'stretch', sm: 'center' },
+          gap: { xs: 1, sm: 0 },
+        }}
+      >
         <Button
           onClick={onClose}
+          fullWidth={isMobile}
           sx={{
             borderRadius: '8px',
             transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -384,6 +410,7 @@ const LabelModal = ({ isOpen, onClose, label }: LabelModalProps) => {
           onClick={handleSubmit}
           disabled={isLoading}
           variant="contained"
+          fullWidth={isMobile}
           sx={{
             borderRadius: '8px',
             background: 'linear-gradient(135deg, #2563EB, #3B82F6)',

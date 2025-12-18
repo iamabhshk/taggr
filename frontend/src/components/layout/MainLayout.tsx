@@ -12,7 +12,14 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
       <Navbar mode={mode} onToggleTheme={toggleTheme} />
-      <Container maxWidth="lg" sx={{ pt: 4 }}>
+      <Container
+        maxWidth="lg"
+        sx={{
+          pt: { xs: 3, sm: 4 },
+          pb: { xs: 4, sm: 6 },
+          px: { xs: 2, sm: 3, md: 4 },
+        }}
+      >
         {children}
       </Container>
     </Box>

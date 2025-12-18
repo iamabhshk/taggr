@@ -93,7 +93,7 @@ const Dashboard = () => {
           </Typography>
         </Box>
 
-        {/* Stats Cards - 2x2 Grid */}
+        {/* Stats Cards - Responsive Grid */}
         {isLoadingStats ? (
           <LoadingSpinner message="Loading statistics..." />
         ) : isStatsError ? (
@@ -136,7 +136,7 @@ const Dashboard = () => {
           ].map((stat, index) => {
             const IconComponent = stat.icon;
             return (
-              <Grid item xs={12} sm={3} key={index}>
+              <Grid item xs={12} sm={6} md={3} key={index}>
                 <Card
                   sx={{
                     background: theme.palette.mode === 'dark'

@@ -178,7 +178,11 @@ const ProfileSettings = () => {
               <Typography variant="body2" sx={{ mb: 2, fontWeight: 500 }}>
                 Profile Picture
               </Typography>
-              <Stack direction="row" spacing={3} alignItems="flex-start">
+              <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={3}
+                alignItems={{ xs: 'center', sm: 'flex-start' }}
+              >
                 <Avatar
                   src={avatarPreview}
                   alt={displayName}
@@ -186,6 +190,7 @@ const ProfileSettings = () => {
                     width: 100,
                     height: 100,
                     border: `2px solid ${muiTheme.palette.divider}`,
+                    mb: { xs: 1, sm: 0 },
                   }}
                 />
                 <Stack spacing={1.5} flex={1}>
@@ -195,7 +200,7 @@ const ProfileSettings = () => {
                     startIcon={<PhotoCameraIcon />}
                     size="medium"
                     sx={{
-                      alignSelf: 'flex-start',
+                      alignSelf: { xs: 'center', sm: 'flex-start' },
                       textTransform: 'none',
                     }}
                   >
@@ -220,7 +225,7 @@ const ProfileSettings = () => {
                           fileInputRef.current.value = '';
                         }
                       }}
-                      sx={{ alignSelf: 'flex-start', textTransform: 'none' }}
+                      sx={{ alignSelf: { xs: 'center', sm: 'flex-start' }, textTransform: 'none' }}
                     >
                       Remove Avatar
                     </Button>

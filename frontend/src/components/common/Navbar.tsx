@@ -17,7 +17,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import taggIcon from '../../assets/taggr-icon.jpg';
+import Logo from '../../assets/Logo.png';
 import LabelModal from '@/components/labels/LabelModal';
 
 const MotionTab = motion(Tab);
@@ -33,6 +33,7 @@ const Navbar = ({ onToggleSidebar, onToggleTheme, mode = 'light' }: NavbarProps)
   const navigate = useNavigate();
   const location = useLocation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [navAnchorEl, setNavAnchorEl] = useState<null | HTMLElement>(null);
   const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
 
   const getTabIndex = () => {
@@ -66,6 +67,19 @@ const Navbar = ({ onToggleSidebar, onToggleTheme, mode = 'light' }: NavbarProps)
     handleMenuClose();
   };
 
+  const handleNavMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setNavAnchorEl(event.currentTarget);
+  };
+
+  const handleNavMenuClose = () => {
+    setNavAnchorEl(null);
+  };
+
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    handleNavMenuClose();
+  };
+
   return (
     <AppBar
       position="sticky"
@@ -85,7 +99,7 @@ const Navbar = ({ onToggleSidebar, onToggleTheme, mode = 'light' }: NavbarProps)
       }}
     >
       <Toolbar sx={{ py: 1 }}>
-        <Stack direction="row" alignItems="center" spacing={2} sx={{ flexGrow: 1 }}>
+        <Stack direction="row" alignItems="center" spacing={2} sx={{ flexGrow: 1, minWidth: 0 }}>
           {onToggleSidebar && (
             <IconButton
               onClick={onToggleSidebar}
@@ -106,12 +120,12 @@ const Navbar = ({ onToggleSidebar, onToggleTheme, mode = 'light' }: NavbarProps)
           )}
           <Box
             component="img"
-            src={taggIcon}
+            src={Logo}
             alt="Taggr Logo"
             onClick={() => navigate('/dashboard')}
             sx={{
-              width: 48,
-              height: 48,
+              width: { xs: 40, sm: 52, md: 64 },
+              height: { xs: 40, sm: 52, md: 64 },
               borderRadius: 2,
               objectFit: 'cover',
               cursor: 'pointer',
@@ -119,7 +133,7 @@ const Navbar = ({ onToggleSidebar, onToggleTheme, mode = 'light' }: NavbarProps)
               borderColor: mode === 'light'
                 ? 'rgba(37, 99, 235, 0.2)'
                 : 'rgba(59, 130, 246, 0.3)',
-              transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+              transition: 'border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease',
               boxShadow: mode === 'light'
                 ? '0 2px 8px rgba(37, 99, 235, 0.1)'
                 : '0 2px 8px rgba(59, 130, 246, 0.2)',
@@ -128,35 +142,45 @@ const Navbar = ({ onToggleSidebar, onToggleTheme, mode = 'light' }: NavbarProps)
                   ? '0 4px 12px rgba(37, 99, 235, 0.2)'
                   : '0 4px 12px rgba(59, 130, 246, 0.3)',
                 borderColor: mode === 'light' ? '#2563EB' : '#3B82F6',
+                transform: 'scale(1.05)',
               },
             }}
           />
           <Typography
             variant="h6"
             sx={{
-              fontFamily: "'Inter', sans-serif",
+              fontFamily: "'Pacifico', cursive",
               fontWeight: 700,
-              background: 'linear-gradient(135deg, #2563EB 0%, #3B82F6 100%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              color: '#2563EB',
               display: { xs: 'none', sm: 'block' },
+              ml: 0.5,
             }}
           >
             Taggr
           </Typography>
         </Stack>
 
-        {/* Navigation Tabs */}
+        {/* Navigation Tabs - hidden on extra-small screens */}
         <Tabs
           value={getTabIndex()}
           onChange={(_, index) => {
             const paths = ['/dashboard', '/labels', '/tokens', '/workspaces'];
             navigate(paths[index]);
           }}
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
           sx={{
             flexGrow: 1,
-            mx: 3,
+            mx: { xs: 1, sm: 2, md: 3 },
+            minWidth: 0,
+            display: { xs: 'none', sm: 'flex' },
+            '& .MuiTabs-flexContainer': {
+              gap: { xs: 0.5, sm: 1 },
+            },
+            '& .MuiTabScrollButton-root': {
+              display: 'none',
+            },
             '& .MuiTabs-indicator': {
               display: 'none',
             },
@@ -171,7 +195,7 @@ const Navbar = ({ onToggleSidebar, onToggleTheme, mode = 'light' }: NavbarProps)
             label="Overview"
             sx={{
               minHeight: 36,
-              fontSize: '0.875rem',
+              fontSize: { xs: '0.75rem', sm: '0.875rem' },
               bgcolor: getTabIndex() === 0
                 ? 'rgba(37, 99, 235, 0.9)'
                 : 'transparent',
@@ -203,7 +227,7 @@ const Navbar = ({ onToggleSidebar, onToggleTheme, mode = 'light' }: NavbarProps)
             label="All Labels"
             sx={{
               minHeight: 36,
-              fontSize: '0.875rem',
+              fontSize: { xs: '0.75rem', sm: '0.875rem' },
               bgcolor: getTabIndex() === 1
                 ? 'rgba(37, 99, 235, 0.9)'
                 : 'transparent',
@@ -235,7 +259,7 @@ const Navbar = ({ onToggleSidebar, onToggleTheme, mode = 'light' }: NavbarProps)
             label="Tokens"
             sx={{
               minHeight: 36,
-              fontSize: '0.875rem',
+              fontSize: { xs: '0.75rem', sm: '0.875rem' },
               bgcolor: getTabIndex() === 2
                 ? 'rgba(37, 99, 235, 0.9)'
                 : 'transparent',
@@ -267,7 +291,7 @@ const Navbar = ({ onToggleSidebar, onToggleTheme, mode = 'light' }: NavbarProps)
             label="Team"
             sx={{
               minHeight: 36,
-              fontSize: '0.875rem',
+              fontSize: { xs: '0.75rem', sm: '0.875rem' },
               bgcolor: getTabIndex() === 3
                 ? 'rgba(37, 99, 235, 0.9)'
                 : 'transparent',
@@ -294,7 +318,29 @@ const Navbar = ({ onToggleSidebar, onToggleTheme, mode = 'light' }: NavbarProps)
           />
         </Tabs>
 
-        <Stack direction="row" spacing={2} alignItems="center">
+        <Stack direction="row" spacing={2} alignItems="center" sx={{ ml: { xs: 1, sm: 2 } }}>
+          {/* Mobile navigation menu button */}
+          <IconButton
+            onClick={handleNavMenuOpen}
+            sx={{
+              display: { xs: 'inline-flex', sm: 'none' },
+              borderRadius: '8px',
+              bgcolor: mode === 'light'
+                ? 'rgba(37, 99, 235, 0.08)'
+                : 'rgba(59, 130, 246, 0.15)',
+              color: mode === 'light' ? '#2563EB' : '#3B82F6',
+              transition: 'background-color 0.2s ease',
+              '&:hover': {
+                bgcolor: mode === 'light'
+                  ? 'rgba(37, 99, 235, 0.15)'
+                  : 'rgba(59, 130, 246, 0.25)',
+              },
+            }}
+            aria-label="Open navigation menu"
+          >
+            <MenuIcon />
+          </IconButton>
+
           {onToggleTheme && (
             <IconButton
               onClick={onToggleTheme}
@@ -316,11 +362,13 @@ const Navbar = ({ onToggleSidebar, onToggleTheme, mode = 'light' }: NavbarProps)
             </IconButton>
           )}
 
+          {/* Desktop Create Label button */}
           <Button
             variant="contained"
             startIcon={<Add />}
             onClick={() => setIsLabelModalOpen(true)}
             sx={{
+              display: { xs: 'none', sm: 'inline-flex' },
               bgcolor: '#000000',
               color: '#ffffff',
               borderRadius: '8px',
@@ -341,6 +389,25 @@ const Navbar = ({ onToggleSidebar, onToggleTheme, mode = 'light' }: NavbarProps)
           >
             Create Label
           </Button>
+          {/* Mobile Create Label icon button */}
+          <IconButton
+            onClick={() => setIsLabelModalOpen(true)}
+            sx={{
+              display: { xs: 'inline-flex', sm: 'none' },
+              bgcolor: '#000000',
+              color: '#ffffff',
+              borderRadius: '8px',
+              p: 1,
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+              '&:hover': {
+                bgcolor: '#1a1a1a',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)',
+                transform: 'translateY(-1px)',
+              },
+            }}
+          >
+            <Add />
+          </IconButton>
 
           <Box sx={{ position: 'relative' }}>
             <IconButton
@@ -432,6 +499,55 @@ const Navbar = ({ onToggleSidebar, onToggleTheme, mode = 'light' }: NavbarProps)
           </Box>
         </Stack>
       </Toolbar>
+
+      {/* Mobile navigation menu */}
+      <Menu
+        anchorEl={navAnchorEl}
+        open={Boolean(navAnchorEl)}
+        onClose={handleNavMenuClose}
+        transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+        PaperProps={{
+          sx: {
+            mt: 1,
+            minWidth: 220,
+            borderRadius: '12px',
+            bgcolor: mode === 'light'
+              ? 'rgba(255, 255, 255, 0.98)'
+              : 'rgba(30, 41, 59, 0.98)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid',
+            borderColor: mode === 'light'
+              ? 'rgba(79, 70, 229, 0.1)'
+              : 'rgba(124, 58, 237, 0.2)',
+          },
+        }}
+      >
+        <MenuItem
+          selected={getTabIndex() === 0}
+          onClick={() => handleNavigate('/dashboard')}
+        >
+          Overview
+        </MenuItem>
+        <MenuItem
+          selected={getTabIndex() === 1}
+          onClick={() => handleNavigate('/labels')}
+        >
+          All Labels
+        </MenuItem>
+        <MenuItem
+          selected={getTabIndex() === 2}
+          onClick={() => handleNavigate('/tokens')}
+        >
+          Tokens
+        </MenuItem>
+        <MenuItem
+          selected={getTabIndex() === 3}
+          onClick={() => handleNavigate('/workspaces')}
+        >
+          Team
+        </MenuItem>
+      </Menu>
 
       <LabelModal
         isOpen={isLabelModalOpen}

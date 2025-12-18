@@ -168,8 +168,14 @@ const Tokens = () => {
         </Box>
 
         {/* Tokens Section */}
-        <Paper variant="outlined" sx={{ p: 3, borderRadius: '12px', backgroundColor: cardBg }}>
-          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+        <Paper variant="outlined" sx={{ p: { xs: 2, sm: 3 }, borderRadius: '12px', backgroundColor: cardBg }}>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            justifyContent="space-between"
+            alignItems={{ xs: 'flex-start', sm: 'center' }}
+            spacing={2}
+            sx={{ mb: 2 }}
+          >
             <Stack direction="row" spacing={1} alignItems="center">
               <KeyIcon sx={{ color: '#2563EB' }} />
               <Typography variant="h6">Your Tokens</Typography>
@@ -179,6 +185,7 @@ const Tokens = () => {
               variant="contained"
               onClick={() => setIsNewTokenOpen(true)}
               sx={{
+                alignSelf: { xs: 'stretch', sm: 'auto' },
                 background: 'linear-gradient(135deg, #2563EB 0%, #3B82F6 100%)',
                 '&:hover': {
                   background: 'linear-gradient(135deg, #1D4ED8 0%, #2563EB 100%)',
@@ -213,7 +220,7 @@ const Tokens = () => {
               </Button>
             </Box>
           ) : (
-            <TableContainer>
+            <TableContainer sx={{ maxHeight: 420, overflowX: 'auto' }}>
               <Table size="small">
                 <TableHead>
                   <TableRow>

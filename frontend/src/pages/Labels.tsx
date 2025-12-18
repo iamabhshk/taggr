@@ -136,9 +136,12 @@ const Labels = () => {
       <Box>
         {/* Search and Actions */}
         <MotionStack
-          direction="row"
+          direction={{ xs: 'column', sm: 'row' }}
           spacing={2}
-          sx={{ mb: 3 }}
+          sx={{
+            mb: 3,
+            alignItems: { xs: 'stretch', sm: 'center' },
+          }}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
@@ -157,7 +160,7 @@ const Labels = () => {
             }}
             size="small"
             sx={{
-              maxWidth: '400px',
+              maxWidth: { xs: '100%', sm: '400px' },
               backgroundColor: cardBg,
               '& .MuiOutlinedInput-root': {
                 borderRadius: '6px',
@@ -181,7 +184,7 @@ const Labels = () => {
             sx={{
               borderRadius: '6px',
               fontSize: '0.8rem',
-              px: 1.5,
+              px: { xs: 1.25, sm: 1.5 },
               py: 0.5,
               backgroundColor: hasActiveFilters ? '#2563EB' : cardBg,
               color: hasActiveFilters ? 'white' : undefined,
@@ -220,7 +223,7 @@ const Labels = () => {
             sx={{
               borderRadius: '6px',
               fontSize: '0.8rem',
-              px: 1.5,
+              px: { xs: 1.25, sm: 1.5 },
               py: 0.5,
               background: 'linear-gradient(135deg, #2563EB, #3B82F6)',
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',

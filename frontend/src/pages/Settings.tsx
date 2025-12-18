@@ -80,10 +80,32 @@ const Settings = () => {
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: isDark ? theme.palette.background.default : theme.palette.grey[50] }}>
       <Navbar mode={mode} onToggleTheme={toggleTheme} />
-      <Box sx={{ p: 4, maxWidth: 900, mx: 'auto' }}>
-          <Typography variant="h4" sx={{ mb: 3, fontWeight: 'bold' }}>Settings</Typography>
+      <Box
+        sx={{
+          px: { xs: 2, sm: 4 },
+          py: { xs: 3, sm: 4 },
+          maxWidth: 900,
+          mx: 'auto',
+        }}
+      >
+          <Typography
+            variant="h4"
+            sx={{
+              mb: 3,
+              fontWeight: 'bold',
+              fontSize: { xs: '1.6rem', sm: '2rem' },
+            }}
+          >
+            Settings
+          </Typography>
 
-          <Paper sx={{ borderRadius: '16px', boxShadow: 1, backgroundColor: cardBg }}>
+          <Paper
+            sx={{
+              borderRadius: '16px',
+              boxShadow: 1,
+              backgroundColor: cardBg,
+            }}
+          >
             <Tabs
               value={tabValue}
               onChange={(_, newValue) => setTabValue(newValue)}
@@ -113,8 +135,15 @@ const Settings = () => {
             </TabPanel>
 
             <TabPanel value={tabValue} index={1}>
-              <Stack spacing={3} sx={{ px: 2 }}>
-                <Paper variant="outlined" sx={{ p: 3, borderRadius: '12px', backgroundColor: cardBg }}>
+              <Stack spacing={3} sx={{ px: 2, pb: 2 }}>
+                <Paper
+                  variant="outlined"
+                  sx={{
+                    p: { xs: 2, sm: 3 },
+                    borderRadius: '12px',
+                    backgroundColor: cardBg,
+                  }}
+                >
                   <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
                     <DownloadIcon sx={{ color: theme.palette.info.main }} />
                     <Typography variant="h6">Export Data</Typography>
@@ -140,7 +169,14 @@ const Settings = () => {
                     </Button>
                   </Stack>
                 </Paper>
-                <Paper variant="outlined" sx={{ p: 3, borderRadius: '12px', backgroundColor: cardBg }}>
+                <Paper
+                  variant="outlined"
+                  sx={{
+                    p: { xs: 2, sm: 3 },
+                    borderRadius: '12px',
+                    backgroundColor: cardBg,
+                  }}
+                >
                   <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
                     <DownloadIcon sx={{ color: theme.palette.success.main }} />
                     <Typography variant="h6">Import Labels</Typography>
