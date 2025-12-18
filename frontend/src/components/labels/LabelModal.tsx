@@ -19,7 +19,6 @@ import { trackEvent } from '@/utils/analytics';
 import labelService from '@/services/labelService';
 import type { Label } from '@/types';
 
-const MotionDialog = motion(Dialog);
 const MotionBox = motion(Box);
 
 interface LabelModalProps {

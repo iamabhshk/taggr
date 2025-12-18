@@ -26,7 +26,6 @@ const EditLabel = () => {
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const theme = useTheme();
-  const isDark = theme.palette.mode === 'dark';
 
   const [formData, setFormData] = useState({
     displayName: '',

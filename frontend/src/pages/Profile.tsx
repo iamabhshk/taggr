@@ -82,7 +82,10 @@ const Profile = () => {
   if (isLoading) {
     return (
       <MainLayout>
-        <LoadingSpinner message="Loading profile..." fullHeight />
+        <LoadingSpinner
+          message="Loading profile..."
+          sx={{ minHeight: '60vh' }}
+        />
       </MainLayout>
     );
   }

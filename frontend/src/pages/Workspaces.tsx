@@ -31,7 +31,6 @@ import {
   People as PeopleIcon,
   PersonAdd as InviteIcon,
   Delete as DeleteIcon,
-  Edit as EditIcon,
   ExitToApp as LeaveIcon,
 } from '@mui/icons-material';
 import { useState } from 'react';
@@ -39,8 +38,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import MainLayout from '@/components/layout/MainLayout';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import ErrorDisplay from '@/components/common/ErrorDisplay';
-import workspaceService, { Workspace, WorkspaceRole, WorkspaceMember } from '@/services/workspaceService';
+import workspaceService, { Workspace, WorkspaceRole } from '@/services/workspaceService';
 import { useWorkspace } from '@/contexts/WorkspaceContext';
 
 const roleColors: Record<WorkspaceRole, 'error' | 'warning' | 'info' | 'default'> = {
@@ -74,7 +72,6 @@ const Workspaces = () => {
     message: string;
     onConfirm: () => void;
   }>({ open: false, title: '', message: '', onConfirm: () => {} });
-  const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -186,11 +183,6 @@ const Workspaces = () => {
   const handleMenuClose = () => {
     setMenuAnchor(null);
     setMenuWorkspace(null);
-  };
-
-  const getUserRole = (workspace: Workspace): WorkspaceRole => {
-    const member = workspace.members.find((m) => m.role === 'owner');
-    return member?.role || 'viewer';
   };
 
   const cardBg = isDark ? theme.palette.background.paper : '#ffffff';
@@ -384,7 +376,6 @@ const Workspaces = () => {
                                 size="small"
                                 color="error"
                                 onClick={() => {
-                                  setMemberToRemove(member.userId);
                                   setConfirmDialog({
                                     open: true,
                                     title: 'Remove Member',

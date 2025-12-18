@@ -16,9 +16,14 @@ export const useAuth = () => {
       if (firebaseUser) {
         try {
           const response = await authService.getCurrentUser();
-          setUser(response.user);
+          if (response && response.user) {
+            setUser(response.user);
+          } else {
+            setUser(null);
+          }
         } catch (error) {
           console.error('Failed to fetch user data:', error);
+          setUser(null);
         }
       } else {
         setUser(null);

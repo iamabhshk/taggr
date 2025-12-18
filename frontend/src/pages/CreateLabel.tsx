@@ -22,6 +22,8 @@ const CreateLabel = () => {
     displayName: '',
     value: '',
     description: '',
+    category: '',
+    tags: '',
   });
   const [errors, setErrors] = useState<{ displayName?: string; value?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +34,7 @@ const CreateLabel = () => {
 
   const bg = isDark ? theme.palette.background.default : theme.palette.grey[50];
   const textColor = isDark ? theme.palette.text.primary : theme.palette.grey[800];
-  const mutedColor = isDark ? theme.palette.text.secondary : theme.palette.grey[500];
+  // const mutedColor = isDark ? theme.palette.text.secondary : theme.palette.grey[500];
 
   // Helper: Convert displayName to name (camelCase, no spaces)
   const generateName = (displayName: string) => {
@@ -81,7 +83,7 @@ const CreateLabel = () => {
 
       trackEvent('Label', 'create', 'Label created from CreateLabel page');
       enqueueSnackbar(
-        `Label created successfully! Created at ${new Date(response.data.label.metadata.createdAt).toLocaleString()}`,
+        `Label created successfully! Created at ${new Date(response.label.metadata.createdAt).toLocaleString()}`,
         { variant: 'success' }
       );
 

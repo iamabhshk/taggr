@@ -37,11 +37,11 @@ const ImportLabelsDialog = ({ isOpen, onClose }: ImportLabelsDialogProps) => {
   const importMutation = useMutation({
     mutationFn: (labels: any[]) => labelService.importLabels(labels),
     onSuccess: (data) => {
-      trackEvent('Label', 'import', `Imported ${data.data.imported} labels`);
+      trackEvent('Label', 'import', `Imported ${data.imported} labels`);
       queryClient.invalidateQueries({ queryKey: ['labels'] });
       queryClient.invalidateQueries({ queryKey: ['labelStats'] });
       enqueueSnackbar(
-        `Successfully imported ${data.data.imported} label(s). ${data.data.failed > 0 ? `${data.data.failed} failed.` : ''}`,
+        `Successfully imported ${data.imported} label(s). ${data.failed > 0 ? `${data.failed} failed.` : ''}`,
         { variant: 'success' }
       );
       handleClose();

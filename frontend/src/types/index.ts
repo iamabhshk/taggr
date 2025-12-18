@@ -47,6 +47,8 @@ export interface User {
     theme: 'light' | 'dark';
     notifications: boolean;
     publicProfile: boolean;
+    pushNotifications?: boolean;
+    weeklyReport?: boolean;
   };
 }
 
