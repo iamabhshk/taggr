@@ -320,7 +320,7 @@ const Tokens = () => {
                 taggr pull --all
               </Box>
               <Typography variant="body2" sx={{ color: theme.palette.grey[500], mt: 1, fontSize: '0.8rem' }}>
-                This creates a ./taggr folder with labels.json and labels.d.ts files.
+                This creates a ./taggr folder with labels.json, labels.d.ts, and .taggr.json (metadata) files.
               </Typography>
             </Box>
             <Box>
@@ -343,13 +343,16 @@ const { myLabel, submitButton } = labels;`}
               <Box component="pre" sx={{ display: 'block', p: 2, m: 0, backgroundColor: codeBg, borderRadius: '8px', fontSize: '0.875rem', fontFamily: 'monospace', color: codeColor, whiteSpace: 'pre-wrap' }}>
                 taggr pull --all
               </Box>
+              <Typography variant="body2" sx={{ color: theme.palette.grey[500], mt: 1, fontSize: '0.8rem' }}>
+                Or use <code style={{ backgroundColor: codeBg, padding: '2px 4px', borderRadius: '4px' }}>taggr sync</code> for the same result.
+              </Typography>
             </Box>
           </Stack>
         </Paper>
 
         {/* Other Commands Section */}
         <Paper variant="outlined" sx={{ p: 3, borderRadius: '12px', backgroundColor: cardBg }}>
-          <Typography variant="h6" sx={{ mb: 2, fontSize: '1rem' }}>Other Useful Commands</Typography>
+          <Typography variant="h6" sx={{ mb: 2, fontSize: '1rem' }}>All Available Commands</Typography>
           <Box component="table" sx={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
             <Box component="thead">
               <Box component="tr">
@@ -367,14 +370,76 @@ const { myLabel, submitButton } = labels;`}
                 <Box component="td" sx={{ p: 1, color: theme.palette.grey[600] }}>View all your labels</Box>
               </Box>
               <Box component="tr">
+                <Box component="td" sx={{ p: 1, fontFamily: 'monospace', color: codeColor }}>taggr pull --all</Box>
+                <Box component="td" sx={{ p: 1, color: theme.palette.grey[600] }}>Pull all labels to your project</Box>
+              </Box>
+              <Box component="tr">
+                <Box component="td" sx={{ p: 1, fontFamily: 'monospace', color: codeColor }}>taggr sync</Box>
+                <Box component="td" sx={{ p: 1, color: theme.palette.grey[600] }}>Force sync all labels (alias for pull --all)</Box>
+              </Box>
+              <Box component="tr">
+                <Box component="td" sx={{ p: 1, fontFamily: 'monospace', color: codeColor }}>taggr check</Box>
+                <Box component="td" sx={{ p: 1, color: theme.palette.grey[600] }}>Check if labels are up-to-date</Box>
+              </Box>
+              <Box component="tr">
+                <Box component="td" sx={{ p: 1, fontFamily: 'monospace', color: codeColor }}>taggr check --strict</Box>
+                <Box component="td" sx={{ p: 1, color: theme.palette.grey[600] }}>Fail build if labels are outdated (for CI/CD)</Box>
+              </Box>
+              <Box component="tr">
+                <Box component="td" sx={{ p: 1, fontFamily: 'monospace', color: codeColor }}>taggr watch</Box>
+                <Box component="td" sx={{ p: 1, color: theme.palette.grey[600] }}>Auto-sync when labels change in cloud</Box>
+              </Box>
+              <Box component="tr">
+                <Box component="td" sx={{ p: 1, fontFamily: 'monospace', color: codeColor }}>taggr status</Box>
+                <Box component="td" sx={{ p: 1, color: theme.palette.grey[600] }}>Show sync status and label versions</Box>
+              </Box>
+              <Box component="tr">
                 <Box component="td" sx={{ p: 1, fontFamily: 'monospace', color: codeColor }}>taggr logout</Box>
                 <Box component="td" sx={{ p: 1, color: theme.palette.grey[600] }}>Sign out from CLI</Box>
               </Box>
             </Box>
           </Box>
           <Typography variant="body2" sx={{ color: theme.palette.grey[500], mt: 2, fontSize: '0.8rem' }}>
-            Tip: Add ./taggr to your .gitignore if you don't want to commit generated files.
+            Tip: Add <code style={{ backgroundColor: codeBg, padding: '2px 4px', borderRadius: '4px' }}>./taggr</code> to your .gitignore if you don't want to commit generated files. The CLI tracks versions automatically in <code style={{ backgroundColor: codeBg, padding: '2px 4px', borderRadius: '4px' }}>.taggr.json</code>.
           </Typography>
+        </Paper>
+
+        {/* Advanced Features Section */}
+        <Paper variant="outlined" sx={{ p: 3, borderRadius: '12px', backgroundColor: cardBg }}>
+          <Typography variant="h6" sx={{ mb: 2, fontSize: '1rem' }}>Advanced Features</Typography>
+          <Stack spacing={2}>
+            <Box>
+              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>Version Tracking</Typography>
+              <Typography variant="body2" sx={{ color: theme.palette.grey[600], mb: 1 }}>
+                The CLI automatically tracks which version of each label you're using. This ensures your team stays in sync and prevents outdated labels in production.
+              </Typography>
+            </Box>
+            <Box>
+              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>Build-Time Validation</Typography>
+              <Typography variant="body2" sx={{ color: theme.palette.grey[600], mb: 1 }}>
+                Use <code style={{ backgroundColor: codeBg, padding: '2px 4px', borderRadius: '4px' }}>taggr check --strict</code> in your CI/CD pipeline to fail builds if labels are outdated. This prevents deploying stale labels to production.
+              </Typography>
+              <Box component="pre" sx={{ display: 'block', p: 2, m: 0, backgroundColor: codeBg, borderRadius: '8px', fontSize: '0.875rem', fontFamily: 'monospace', color: codeColor, whiteSpace: 'pre-wrap', mt: 1 }}>
+{`# In your CI/CD pipeline
+taggr check --strict`}
+              </Box>
+            </Box>
+            <Box>
+              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>Auto-Sync Mode</Typography>
+              <Typography variant="body2" sx={{ color: theme.palette.grey[600], mb: 1 }}>
+                Run <code style={{ backgroundColor: codeBg, padding: '2px 4px', borderRadius: '4px' }}>taggr watch</code> to automatically sync labels when they change in the cloud. Perfect for development!
+              </Typography>
+              <Box component="pre" sx={{ display: 'block', p: 2, m: 0, backgroundColor: codeBg, borderRadius: '8px', fontSize: '0.875rem', fontFamily: 'monospace', color: codeColor, whiteSpace: 'pre-wrap', mt: 1 }}>
+                taggr watch
+              </Box>
+            </Box>
+            <Box>
+              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>Check Sync Status</Typography>
+              <Typography variant="body2" sx={{ color: theme.palette.grey[600], mb: 1 }}>
+                Use <code style={{ backgroundColor: codeBg, padding: '2px 4px', borderRadius: '4px' }}>taggr status</code> to see when labels were last synced and which versions you're using.
+              </Typography>
+            </Box>
+          </Stack>
         </Paper>
       </Stack>
 

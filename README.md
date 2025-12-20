@@ -24,7 +24,12 @@ Taggr helps you manage all your application labels (text strings, messages, UI c
 Each user's labels are completely private and secure. Your labels are only accessible to you unless you explicitly share them through workspaces. All data is encrypted and stored securely.
 
 ### 🖥️ CLI Tool
-Pull labels directly into your project using our command-line interface. No need to manually copy-paste or maintain separate files. Simply run `taggr pull --all` and your labels are ready to use in your codebase.
+Pull labels directly into your project using our command-line interface. No need to manually copy-paste or maintain separate files. The CLI includes:
+- **Version tracking** - Know exactly which version of each label you're using
+- **Build-time validation** - Fail builds if labels are outdated (CI/CD integration)
+- **Auto-sync mode** - Automatically sync labels when they change in the cloud
+- **Integrity checks** - Detect and prevent manual edits to label files
+- Simply run `taggr pull --all` and your labels are ready to use in your codebase.
 
 ### 📦 Version Control
 Track changes to your labels with semantic versioning (major.minor.patch). Each version includes a changelog, so you can see exactly what changed and when. Perfect for maintaining consistency across deployments.
@@ -96,6 +101,7 @@ taggr pull --all
 This creates a `./taggr` folder in your project with:
 - `labels.json` - All your labels in one file
 - `labels.d.ts` - TypeScript definitions for autocomplete
+- `.taggr.json` - Metadata file tracking versions and sync status (automatically managed)
 
 ### 6. Use in Your Code
 
@@ -142,20 +148,52 @@ const { myLabel, submitButton } = labels;
 ### CLI Commands
 
 ```bash
-# Check which account you're logged in as
-taggr whoami
+# Authentication
+taggr login <token>        # Authenticate with your API token
+taggr logout               # Remove saved credentials
+taggr whoami               # Check which account you're logged in as
 
-# List all your labels
-taggr list
+# Managing Labels
+taggr list                 # List all your labels
+taggr pull --all           # Pull all labels to your project
+taggr pull <label-name>    # Pull a specific label
+taggr sync                 # Force sync all labels (alias for pull --all)
 
-# Pull all labels to your project
-taggr pull --all
+# Version Control & Validation
+taggr check                # Check if labels are up-to-date
+taggr check --strict       # Fail build if labels are outdated (for CI/CD)
+taggr status               # Show sync status and label versions
 
-# Pull a specific label
-taggr pull <label-name>
+# Auto-Sync
+taggr watch                # Watch for label changes and auto-sync
+taggr watch --interval 30  # Custom poll interval (default: 30 seconds)
+```
 
-# Logout
-taggr logout
+### Advanced Features
+
+#### Version Tracking
+The CLI automatically tracks which version of each label you're using. This ensures your team stays in sync and prevents outdated labels in production.
+
+#### Build-Time Validation
+Use `taggr check --strict` in your CI/CD pipeline to fail builds if labels are outdated. This prevents deploying stale labels to production.
+
+```bash
+# In your CI/CD pipeline
+taggr check --strict
+```
+
+#### Auto-Sync Mode
+Run `taggr watch` to automatically sync labels when they change in the cloud. Perfect for development!
+
+```bash
+taggr watch
+```
+
+#### Check Sync Status
+Use `taggr status` to see when labels were last synced and which versions you're using.
+
+```bash
+taggr status
 ```
 
 ## Project Structure

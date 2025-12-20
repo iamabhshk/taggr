@@ -7,7 +7,7 @@ const CONFIG_DIR = path.join(os.homedir(), '.taggr');
 const CONFIG_FILE = path.join(CONFIG_DIR, 'config.json');
 
 // Default to production API URL, fallback to localhost for development
-const DEFAULT_API_URL = process.env.TAGGR_API_URL || 'https://taggr-lab.vercel.app/api';
+const DEFAULT_API_URL = process.env.TAGGR_API_URL || 'https://taggr.onrender.com/api';
 
 /**
  * Ensure config directory exists
@@ -25,14 +25,24 @@ export async function getConfig(): Promise<TaggrConfig | null> {
     
     if (await fs.pathExists(CONFIG_FILE)) {
       const config = await fs.readJson(CONFIG_FILE);
-      return {
-        apiKey: config.apiKey || '',
-        apiUrl: config.apiUrl || DEFAULT_API_URL,
-      };
+      
+      // Validate config structure
+      if (config && typeof config === 'object' && !Array.isArray(config)) {
+        return {
+          apiKey: config.apiKey || '',
+          apiUrl: config.apiUrl || DEFAULT_API_URL,
+        };
+      } else {
+        // Config file is corrupted (not an object)
+        console.warn(`Warning: Config file at ${CONFIG_FILE} is corrupted. Please login again.`);
+        return null;
+      }
     }
     
     return null;
   } catch (error) {
+    // If JSON parsing fails, config is corrupted
+    console.warn(`Warning: Could not read config file at ${CONFIG_FILE}. Please login again.`);
     return null;
   }
 }

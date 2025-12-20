@@ -47,3 +47,16 @@ export interface WhoamiResponse {
   user: UserInfo;
 }
 
+export interface LabelMetadata {
+  version: string;
+  syncedAt: string;
+  checksum: string;
+}
+
+export interface TaggrMetadata {
+  syncedAt: string;
+  apiUrl: string;
+  labels: Record<string, LabelMetadata>;
+  overallChecksum: string;
+}
+

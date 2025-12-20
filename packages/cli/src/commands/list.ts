@@ -10,7 +10,13 @@ export async function listCommand(): Promise<void> {
     const config = await requireAuth();
     initApi(config);
 
-    const { labels, count } = await getLabels();
+    const labelsResponse = await getLabels();
+    
+    if (!labelsResponse || !labelsResponse.labels || typeof labelsResponse.count !== 'number') {
+      throw new Error('Invalid response from server: labels data not found');
+    }
+    
+    const { labels, count } = labelsResponse;
 
     spinner.stop();
 
@@ -29,10 +35,13 @@ export async function listCommand(): Promise<void> {
         ? chalk.green('●') 
         : chalk.yellow('○');
       
-      console.log(`  ${status} ${chalk.white(label.name)} ${chalk.dim(`v${label.version}`)}`);
+      const labelName = label.name || 'Unnamed';
+      const labelVersion = label.version || '0.0.0';
+      console.log(`  ${status} ${chalk.white(labelName)} ${chalk.dim(`v${labelVersion}`)}`);
       
-      if (label.description) {
-        console.log(chalk.dim(`    ${label.description.substring(0, 60)}${label.description.length > 60 ? '...' : ''}`));
+      if (label.description && typeof label.description === 'string') {
+        const desc = label.description.substring(0, 60);
+        console.log(chalk.dim(`    ${desc}${label.description.length > 60 ? '...' : ''}`));
       }
     }
 
