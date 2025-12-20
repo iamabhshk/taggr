@@ -87,6 +87,7 @@ const LabelModal = ({ isOpen, onClose, label }: LabelModalProps) => {
     onSuccess: () => {
       trackEvent('Label', 'create', 'Label created successfully');
       queryClient.invalidateQueries({ queryKey: ['labels'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-labels'] });
       queryClient.invalidateQueries({ queryKey: ['labelStats'] });
       enqueueSnackbar('Label created successfully!', { variant: 'success' });
       setFormData({ displayName: '', value: '', description: '', category: '', tags: '' });
@@ -106,6 +107,7 @@ const LabelModal = ({ isOpen, onClose, label }: LabelModalProps) => {
     onSuccess: () => {
       trackEvent('Label', 'update', 'Label updated successfully');
       queryClient.invalidateQueries({ queryKey: ['labels'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-labels'] });
       queryClient.invalidateQueries({ queryKey: ['labelStats'] });
       enqueueSnackbar('Label updated successfully!', { variant: 'success' });
       setFormData({ displayName: '', value: '', description: '', category: '', tags: '' });
@@ -126,12 +128,21 @@ const LabelModal = ({ isOpen, onClose, label }: LabelModalProps) => {
       value: formData.value,
     };
 
-    if (formData.description) {
-      submitData.description = formData.description;
-    }
-
-    if (formData.category) {
-      submitData.category = formData.category;
+    // For updates, always include description and category to allow clearing them
+    // For creates, only include if they have values
+    if (label) {
+      // Update: allow clearing optional fields by sending trimmed empty strings
+      // Backend checks for !== undefined, so empty strings will clear the field
+      submitData.description = formData.description.trim();
+      submitData.category = formData.category.trim();
+    } else {
+      // Create: only include if they have values
+      if (formData.description.trim()) {
+        submitData.description = formData.description.trim();
+      }
+      if (formData.category.trim()) {
+        submitData.category = formData.category.trim();
+      }
     }
 
     if (formData.tags) {
@@ -235,7 +246,7 @@ const LabelModal = ({ isOpen, onClose, label }: LabelModalProps) => {
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 3,
+            gap: { xs: 2, md: 3 },
             pt: 1,
           }}
         >

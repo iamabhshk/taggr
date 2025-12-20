@@ -43,8 +43,10 @@ const ProfileSettings = () => {
     if (user) {
       setDisplayName(user.displayName || '');
       setUsername(user.username || '');
-      setAvatar(user.avatar || '');
-      setAvatarPreview(user.avatar || '');
+      // Initialize avatar with user's current avatar (could be URL or empty)
+      const currentAvatar = user.avatar || '';
+      setAvatar(currentAvatar);
+      setAvatarPreview(currentAvatar);
       setEmailNotifications(user.preferences?.notifications ?? true);
       setPushNotifications(user.preferences?.pushNotifications ?? false);
       setWeeklyReport(user.preferences?.weeklyReport ?? true);
@@ -152,16 +154,27 @@ const ProfileSettings = () => {
   });
 
   const handleSaveProfile = () => {
-    updateProfileMutation.mutate({
+    const updateData: any = {
       displayName,
-      username: username || undefined,
-      avatar: avatar || undefined,
       preferences: {
         notifications: emailNotifications,
         pushNotifications,
         weeklyReport,
       },
-    });
+    };
+
+    // Only include username if it's not empty
+    if (username) {
+      updateData.username = username;
+    }
+
+    // Always include avatar to ensure it's saved (even if empty string)
+    // Backend will only update if avatar !== undefined
+    if (avatar !== undefined) {
+      updateData.avatar = avatar;
+    }
+
+    updateProfileMutation.mutate(updateData);
   };
 
   return (

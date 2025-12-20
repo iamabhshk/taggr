@@ -9,6 +9,7 @@ import {
   CircularProgress,
   Chip,
   useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -26,6 +27,7 @@ const EditLabel = () => {
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [formData, setFormData] = useState({
     displayName: '',
@@ -95,14 +97,12 @@ const EditLabel = () => {
       value: formData.value,
     };
 
-    if (formData.description) {
-      updateData.description = formData.description;
-    }
+    // Always include description and category to allow clearing them
+    // Backend checks for !== undefined, so empty strings will clear the field
+    updateData.description = formData.description.trim();
+    updateData.category = formData.category.trim();
 
-    if (formData.category) {
-      updateData.category = formData.category;
-    }
-
+    // Only include tags if they exist
     if (formData.tags) {
       updateData.tags = formData.tags.split(',').map((tag) => tag.trim()).filter(Boolean);
     }
@@ -156,10 +156,25 @@ const EditLabel = () => {
         <Grid item xs={12} md="auto">
           <Sidebar />
         </Grid>
-        <Grid item xs={12} md sx={{ p: 4, ml: { xs: 0, md: '240px' } }}>
-          <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 3 }}>
+        <Grid item xs={12} md sx={{ p: { xs: 2, sm: 3, md: 4 }, ml: { xs: 0, md: '240px' } }}>
+          <Stack 
+            direction={{ xs: 'column', sm: 'row' }} 
+            justifyContent="space-between" 
+            alignItems={{ xs: 'flex-start', sm: 'flex-start' }} 
+            spacing={{ xs: 2, sm: 0 }}
+            sx={{ mb: { xs: 2, md: 3 } }}
+          >
             <Box>
-              <Typography variant="h4" sx={{ mb: 1, fontWeight: 'bold' }}>Edit Label</Typography>
+              <Typography 
+                variant="h4" 
+                sx={{ 
+                  mb: 1, 
+                  fontWeight: 'bold',
+                  fontSize: { xs: '1.5rem', md: '2rem' },
+                }}
+              >
+                Edit Label
+              </Typography>
               <Stack direction="row" spacing={1} alignItems="center">
                 <Typography variant="body2" sx={{ color: theme.palette.grey[600] }}>Package:</Typography>
                 <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 'bold' }}>
@@ -172,11 +187,12 @@ const EditLabel = () => {
                 />
               </Stack>
             </Box>
-            <Stack direction="row" spacing={2}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ width: { xs: '100%', sm: 'auto' } }}>
               <Button
                 variant="outlined"
                 onClick={() => setIsPublishDialogOpen(true)}
                 disabled={label.isPublished}
+                fullWidth={isMobile}
                 sx={{
                   borderColor: 'primary.main',
                   '&:hover': {
@@ -187,7 +203,11 @@ const EditLabel = () => {
               >
                 {label.isPublished ? 'Published' : 'Publish'}
               </Button>
-              <Button variant="text" onClick={() => navigate('/labels')}>
+              <Button 
+                variant="text" 
+                onClick={() => navigate('/labels')}
+                fullWidth={isMobile}
+              >
                 Cancel
               </Button>
             </Stack>
@@ -197,13 +217,13 @@ const EditLabel = () => {
             component="form"
             onSubmit={handleSubmit}
             sx={{
-              p: 4,
+              p: { xs: 2, sm: 3, md: 4 },
               borderRadius: '16px',
               boxShadow: 1,
               mb: 2,
             }}
           >
-            <Stack spacing={3}>
+            <Stack spacing={{ xs: 2, md: 3 }}>
               <TextField
                 required
                 fullWidth
@@ -257,14 +277,19 @@ const EditLabel = () => {
                 helperText="Comma-separated tags for easier search"
               />
 
-              <Stack direction="row" spacing={2} sx={{ pt: 2 }}>
+              <Stack 
+                direction={{ xs: 'column', sm: 'row' }} 
+                spacing={2} 
+                sx={{ pt: 2 }}
+              >
                 <Button
                   type="submit"
                   variant="contained"
-                  size="large"
+                  size={isMobile ? 'medium' : 'large'}
                   disabled={updateMutation.isPending}
+                  fullWidth={isMobile}
                   sx={{
-                    flex: 1,
+                    flex: { xs: 'none', sm: 1 },
                     background: 'linear-gradient(135deg, #14B8A6, #0d9488)',
                     '&:hover': {
                       background: 'linear-gradient(135deg, #0d9488, #0f766e)',
@@ -275,9 +300,10 @@ const EditLabel = () => {
                 </Button>
                 <Button
                   variant="outlined"
-                  size="large"
+                  size={isMobile ? 'medium' : 'large'}
                   onClick={() => navigate('/labels')}
-                  sx={{ flex: 1 }}
+                  fullWidth={isMobile}
+                  sx={{ flex: { xs: 'none', sm: 1 } }}
                 >
                   Cancel
                 </Button>
@@ -286,8 +312,17 @@ const EditLabel = () => {
           </Paper>
 
           {label.metadata && (
-            <Paper sx={{ p: 4, borderRadius: '16px', boxShadow: 1 }}>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Metadata</Typography>
+            <Paper sx={{ p: { xs: 2, sm: 3, md: 4 }, borderRadius: '16px', boxShadow: 1 }}>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  mb: 2, 
+                  fontWeight: 600,
+                  fontSize: { xs: '1rem', md: '1.25rem' },
+                }}
+              >
+                Metadata
+              </Typography>
               <Stack spacing={1}>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography variant="body2" sx={{ color: theme.palette.grey[600] }}>Created:</Typography>

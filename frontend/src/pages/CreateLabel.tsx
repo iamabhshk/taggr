@@ -8,6 +8,7 @@ import {
   Stack,
   Paper,
   useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
@@ -31,6 +32,7 @@ const CreateLabel = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const bg = isDark ? theme.palette.background.default : theme.palette.grey[50];
   const textColor = isDark ? theme.palette.text.primary : theme.palette.grey[800];
@@ -103,8 +105,16 @@ const CreateLabel = () => {
         <Grid item xs={12} md="auto">
           <Sidebar />
         </Grid>
-        <Grid item xs={12} md sx={{ p: 4, ml: { xs: 0, md: '240px' } }}>
-          <Typography variant="h4" sx={{ mb: 3, color: textColor, fontWeight: 'bold' }}>
+        <Grid item xs={12} md sx={{ p: { xs: 2, sm: 3, md: 4 }, ml: { xs: 0, md: '240px' } }}>
+          <Typography 
+            variant="h4" 
+            sx={{ 
+              mb: { xs: 2, md: 3 }, 
+              color: textColor, 
+              fontWeight: 'bold',
+              fontSize: { xs: '1.5rem', md: '2rem' },
+            }}
+          >
             Create New Label
           </Typography>
 
@@ -112,13 +122,13 @@ const CreateLabel = () => {
             component="form"
             onSubmit={handleSubmit}
             sx={{
-              p: 4,
+              p: { xs: 2, sm: 3, md: 4 },
               maxWidth: '600px',
               borderRadius: '16px',
               boxShadow: 1,
             }}
           >
-            <Stack spacing={3}>
+            <Stack spacing={{ xs: 2, md: 3 }}>
               <Box>
                 <TextField
                   required
@@ -185,13 +195,15 @@ const CreateLabel = () => {
               <Button
                 type="submit"
                 variant="contained"
-                size="large"
+                size={isMobile ? 'medium' : 'large'}
                 disabled={isLoading}
+                fullWidth={isMobile}
                 sx={{
                   background: 'linear-gradient(135deg, #2563EB, #3B82F6)',
                   '&:hover': {
                     background: 'linear-gradient(135deg, #1D4ED8, #2563EB)',
                   },
+                  mt: { xs: 1, md: 0 },
                 }}
               >
                 {isLoading ? (

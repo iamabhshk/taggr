@@ -7,6 +7,8 @@ import {
   IconButton,
   InputAdornment,
   Stack,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
@@ -18,6 +20,8 @@ import { useSnackbar } from 'notistack';
 const Login = () => {
   const [searchParams] = useSearchParams();
   const [isSignUp, setIsSignUp] = useState(searchParams.get('mode') === 'signup');
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   useEffect(() => {
     if (searchParams.get('mode') === 'signup') {
@@ -152,11 +156,12 @@ const Login = () => {
       {/* Main Container */}
       <Box
         sx={{
-          width: '900px',
+          width: { xs: '100%', md: '900px' },
           maxWidth: '95vw',
-          height: '550px',
+          height: { xs: 'auto', md: '550px' },
+          minHeight: { xs: 'auto', md: '550px' },
           bgcolor: '#fff',
-          borderRadius: '24px',
+          borderRadius: { xs: '16px', md: '24px' },
           boxShadow: '0 20px 60px rgba(0, 0, 0, 0.15)',
           position: 'relative',
           overflow: 'hidden',
@@ -166,29 +171,44 @@ const Login = () => {
         {/* Sign In Form (Left side when not signing up) */}
         <Box
           sx={{
-            position: 'absolute',
+            position: isMobile ? 'relative' : 'absolute',
             top: 0,
             left: 0,
-            width: '50%',
-            height: '100%',
-            display: 'flex',
+            width: { xs: '100%', md: '50%' },
+            height: { xs: 'auto', md: '100%' },
+            display: isMobile ? (isSignUp ? 'none' : 'flex') : 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            p: 4,
+            p: { xs: 3, md: 4 },
             transition: 'all 0.6s ease-in-out',
             opacity: isSignUp ? 0 : 1,
             zIndex: isSignUp ? 1 : 5,
           }}
         >
-          <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%', maxWidth: '320px' }}>
+          <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%', maxWidth: { xs: '100%', md: '320px' } }}>
+            {isMobile && (
+              <Button
+                variant="text"
+                onClick={toggleMode}
+                sx={{
+                  mb: 2,
+                  color: '#2563EB',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                }}
+              >
+                Don't have an account? Sign Up
+              </Button>
+            )}
             <Typography
-              variant="h4"
+              variant={isMobile ? 'h5' : 'h4'}
               fontWeight="700"
               textAlign="center"
               sx={{
-                mb: 3,
+                mb: { xs: 2, md: 3 },
                 color: '#2563EB',
                 fontFamily: "'Inter', sans-serif",
+                fontSize: { xs: '1.5rem', md: '2rem' },
               }}
             >
               Sign In
@@ -290,29 +310,44 @@ const Login = () => {
         {/* Sign Up Form (Right side when signing up) */}
         <Box
           sx={{
-            position: 'absolute',
+            position: isMobile ? 'relative' : 'absolute',
             top: 0,
             right: 0,
-            width: '50%',
-            height: '100%',
-            display: 'flex',
+            width: { xs: '100%', md: '50%' },
+            height: { xs: 'auto', md: '100%' },
+            display: isMobile ? (isSignUp ? 'flex' : 'none') : 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            p: 4,
+            p: { xs: 3, md: 4 },
             transition: 'all 0.6s ease-in-out',
             opacity: isSignUp ? 1 : 0,
             zIndex: isSignUp ? 5 : 1,
           }}
         >
-          <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%', maxWidth: '320px' }}>
+          <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%', maxWidth: { xs: '100%', md: '320px' } }}>
+            {isMobile && (
+              <Button
+                variant="text"
+                onClick={toggleMode}
+                sx={{
+                  mb: 2,
+                  color: '#2563EB',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                }}
+              >
+                Already have an account? Sign In
+              </Button>
+            )}
             <Typography
-              variant="h4"
+              variant={isMobile ? 'h5' : 'h4'}
               fontWeight="700"
               textAlign="center"
               sx={{
-                mb: 3,
+                mb: { xs: 2, md: 3 },
                 color: '#2563EB',
                 fontFamily: "'Inter', sans-serif",
+                fontSize: { xs: '1.5rem', md: '2rem' },
               }}
             >
               Create Account
@@ -435,6 +470,7 @@ const Login = () => {
         </Box>
 
         {/* Sliding Overlay Panel */}
+        {!isMobile && (
         <Box
           sx={{
             position: 'absolute',
@@ -520,11 +556,12 @@ const Login = () => {
             }}
           >
             <Typography
-              variant="h3"
+              variant={isMobile ? 'h4' : 'h3'}
               fontWeight="800"
               sx={{
                 mb: 2,
                 fontFamily: "'Inter', sans-serif",
+                fontSize: { xs: '1.5rem', md: '2.5rem' },
               }}
             >
               {isSignUp ? 'Hello, Friend!' : 'Welcome Back!'}
@@ -532,10 +569,12 @@ const Login = () => {
             <Typography
               variant="body1"
               sx={{
-                mb: 4,
+                mb: { xs: 2, md: 4 },
                 opacity: 0.9,
-                maxWidth: '280px',
+                maxWidth: { xs: '100%', md: '280px' },
                 lineHeight: 1.6,
+                fontSize: { xs: '0.875rem', md: '1rem' },
+                px: { xs: 2, md: 0 },
               }}
             >
               {isSignUp
@@ -550,10 +589,11 @@ const Login = () => {
                 borderColor: 'white',
                 borderWidth: '2px',
                 borderRadius: '24px',
-                px: 5,
-                py: 1,
+                px: { xs: 3, md: 5 },
+                py: { xs: 0.75, md: 1 },
                 fontWeight: 600,
                 textTransform: 'none',
+                fontSize: { xs: '0.875rem', md: '1rem' },
                 '&:hover': {
                   borderWidth: '2px',
                   bgcolor: 'rgba(255, 255, 255, 0.1)',
@@ -564,6 +604,7 @@ const Login = () => {
             </Button>
           </Box>
         </Box>
+        )}
       </Box>
     </Box>
   );

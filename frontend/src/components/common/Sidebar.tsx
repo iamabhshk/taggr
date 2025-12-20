@@ -155,7 +155,7 @@ const Sidebar = ({ open = true, onClose }: SidebarProps) => {
           variant="contained"
           size="large"
           startIcon={<Add />}
-          onClick={() => navigate('/labels/create')}
+          onClick={() => navigate('/labels/new')}
           sx={{
             borderRadius: 2,
             py: 1.5,

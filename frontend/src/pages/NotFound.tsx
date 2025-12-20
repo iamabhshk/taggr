@@ -1,8 +1,23 @@
 import { Box, Typography, Button, Stack } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useAuthStore } from '@/stores/authStore';
 
 const NotFound = () => {
   const navigate = useNavigate();
+  const { firebaseUser, isLoading } = useAuthStore();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isLoading && !firebaseUser) {
+      navigate('/login', { replace: true });
+    }
+  }, [firebaseUser, isLoading, navigate]);
+
+  // Don't render if redirecting
+  if (!isLoading && !firebaseUser) {
+    return null;
+  }
 
   return (
     <Box textAlign="center" sx={{ py: 10 }}>
@@ -28,9 +43,9 @@ const NotFound = () => {
         <Button
           variant="contained"
           color="primary"
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate(firebaseUser ? '/dashboard' : '/login')}
         >
-          Go to Dashboard
+          {firebaseUser ? 'Go to Dashboard' : 'Go to Login'}
         </Button>
       </Stack>
     </Box>
