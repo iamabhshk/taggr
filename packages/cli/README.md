@@ -51,7 +51,7 @@ npm install -g @taggr/cli
 taggr login <token> [options]
 
 Options:
-  -u, --url <url>  API URL (default: http://localhost:5000/api)
+  -u, --url <url>  API URL (default: https://taggr-lab.vercel.app/api)
 ```
 
 ### Pull

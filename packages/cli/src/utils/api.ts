@@ -45,8 +45,8 @@ function handleError(error: unknown): never {
       }
       throw new Error(`API error: ${error.response.status}`);
     }
-    if (error.code === 'ECONNREFUSED') {
-      throw new Error('Cannot connect to Taggr API. Is the server running?');
+    if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
+      throw new Error('Cannot connect to Taggr API. Please check:\n  1. The API URL is correct (use --url flag if needed)\n  2. You have an internet connection\n  3. The server is running and accessible');
     }
     throw new Error(`Network error: ${error.message}`);
   }

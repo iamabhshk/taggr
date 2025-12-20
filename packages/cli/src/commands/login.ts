@@ -3,7 +3,8 @@ import ora from 'ora';
 import { saveConfig, getConfig } from '../utils/config.js';
 import { initApi, whoami } from '../utils/api.js';
 
-const DEFAULT_API_URL = 'http://localhost:5000/api';
+// Default to production API URL, fallback to localhost for development
+const DEFAULT_API_URL = process.env.TAGGR_API_URL || 'https://taggr-lab.vercel.app/api';
 
 export async function loginCommand(apiKey: string, options: { url?: string }): Promise<void> {
   const spinner = ora('Verifying API key...').start();

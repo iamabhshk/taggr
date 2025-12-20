@@ -6,7 +6,8 @@ import type { TaggrConfig } from '../types.js';
 const CONFIG_DIR = path.join(os.homedir(), '.taggr');
 const CONFIG_FILE = path.join(CONFIG_DIR, 'config.json');
 
-const DEFAULT_API_URL = 'http://localhost:5000/api';
+// Default to production API URL, fallback to localhost for development
+const DEFAULT_API_URL = process.env.TAGGR_API_URL || 'https://taggr-lab.vercel.app/api';
 
 /**
  * Ensure config directory exists

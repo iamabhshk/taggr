@@ -2,24 +2,42 @@
 
 import { Command } from 'commander';
 import chalk from 'chalk';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import { loginCommand } from './commands/login.js';
 import { logoutCommand } from './commands/logout.js';
 import { whoamiCommand } from './commands/whoami.js';
 import { listCommand } from './commands/list.js';
 import { pullCommand } from './commands/pull.js';
 
+// Read version from package.json
+// When installed globally: node_modules/@taggr/cli/dist/index.js -> ../package.json
+// When in development: packages/cli/dist/index.js -> ../package.json
+let version = '1.0.1'; // fallback version
+try {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  const packageJsonPath = join(__dirname, '../package.json');
+  const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
+  version = packageJson.version || version;
+} catch {
+  // If package.json can't be read, use fallback version
+  // This can happen in some edge cases, but shouldn't affect functionality
+}
+
 const program = new Command();
 
 program
   .name('taggr')
   .description('CLI tool for Taggr - Pull and manage your labels locally')
-  .version('1.0.0');
+  .version(version);
 
 // Login command
 program
   .command('login <api-key>')
   .description('Authenticate with your Taggr API key')
-  .option('-u, --url <url>', 'API URL (default: http://localhost:5000/api)')
+  .option('-u, --url <url>', 'API URL (default: https://taggr-lab.vercel.app/api)')
   .action(loginCommand);
 
 // Logout command
