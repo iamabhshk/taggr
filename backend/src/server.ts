@@ -12,33 +12,42 @@ initSentry();
 
 const server = createServer(app);
 
-// Initialize services
+// Initialize services (non-blocking for database)
 const initializeServices = async () => {
   try {
-    // Connect to MongoDB
-    await connectDB();
-
-    // Initialize Firebase
+    // Initialize Firebase (synchronous)
     initializeFirebase();
 
-    logger.info('✅ All services initialized successfully');
+    // Connect to MongoDB (non-blocking - don't wait for it)
+    // This allows the server to start even if DB is temporarily unavailable
+    connectDB().catch((error) => {
+      logger.error('Database connection failed, but server will continue:', error);
+      logger.warn('⚠️  Health checks will still work. Database will retry automatically.');
+    });
+
+    logger.info('✅ Services initialization started');
   } catch (error) {
     logger.error('❌ Service initialization failed:', error);
-    process.exit(1);
+    // Don't exit - allow server to start for health checks
+    // Firebase errors shouldn't prevent server from starting
   }
 };
 
 // Start server
 const startServer = async () => {
   try {
-    await initializeServices();
-
+    // Start server immediately, don't wait for DB
+    // This prevents 502 errors during cold starts on Render
     server.listen(config.port, () => {
       logger.info(`🚀 Server running on port ${config.port}`);
       logger.info(`📝 Environment: ${config.env}`);
       logger.info(`🔗 API: http://localhost:${config.port}/api`);
       logger.info(`📚 Health check: http://localhost:${config.port}/api/health`);
+      logger.info(`🏓 Ping endpoint: http://localhost:${config.port}/api/ping`);
     });
+
+    // Initialize services in background (non-blocking)
+    await initializeServices();
   } catch (error) {
     logger.error('❌ Failed to start server:', error);
     process.exit(1);

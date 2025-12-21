@@ -20,20 +20,21 @@
     "@mui/icons-material": "^6.5.0",
     "@mui/lab": "^6.0.0-beta.20",
     "@mui/material": "^6.5.0",
+    "@sentry/react": "^7.91.0",
     "@tanstack/react-query": "^5.17.19",
     "axios": "^1.6.5",
     "firebase": "^10.7.2",
     "framer-motion": "^10.18.0",
     "notistack": "^3.0.2",
+    "packlyze": "^3.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-ga4": "^2.1.0",
     "react-hook-form": "^7.49.3",
     "react-icons": "^5.5.0",
     "react-router-dom": "^6.21.3",
     "zod": "^3.22.4",
-    "zustand": "^4.5.0",
-    "@sentry/react": "^7.91.0",
-    "react-ga4": "^2.1.0"
+    "zustand": "^4.5.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.1.5",
@@ -52,6 +53,8 @@
     "prettier": "^3.2.4",
     "typescript": "^5.3.3",
     "vite": "^5.0.11",
-    "vitest": "^1.1.0"
+    "vitest": "^1.1.0",
+    "webpack": "^5.104.1",
+    "webpack-cli": "^6.0.1"
   }
 }
