@@ -24,6 +24,7 @@ import {
   TableCell,
   TableContainer,
   useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -51,6 +52,7 @@ const roleColors: Record<WorkspaceRole, 'error' | 'warning' | 'info' | 'default'
 const Workspaces = () => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const { workspaces, currentWorkspace, setCurrentWorkspace, isLoading, refetchWorkspaces } = useWorkspace();
@@ -197,9 +199,14 @@ const Workspaces = () => {
 
   return (
     <MainLayout>
-      <Stack spacing={3}>
+      <Stack spacing={3} sx={{ p: { xs: 2, md: 0 } }}>
         {/* Header */}
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Stack 
+          direction={{ xs: 'column', md: 'row' }} 
+          justifyContent="space-between" 
+          alignItems={{ xs: 'flex-start', md: 'center' }}
+          spacing={{ xs: 2, md: 0 }}
+        >
           <Box>
             <Typography
               variant="h4"
@@ -211,11 +218,12 @@ const Workspaces = () => {
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 mb: 0.5,
+                fontSize: { xs: '1.75rem', md: '2.125rem' },
               }}
             >
               Workspaces
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.875rem', md: '0.875rem' } }}>
               Collaborate with your team on shared labels
             </Typography>
           </Box>
@@ -223,11 +231,13 @@ const Workspaces = () => {
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => setIsCreateOpen(true)}
+            fullWidth={isMobile}
             sx={{
               background: 'linear-gradient(135deg, #2563EB 0%, #3B82F6 100%)',
               '&:hover': {
                 background: 'linear-gradient(135deg, #1D4ED8 0%, #2563EB 100%)',
               },
+              minWidth: { xs: '100%', md: 'auto' },
             }}
           >
             Create Workspace
@@ -236,13 +246,21 @@ const Workspaces = () => {
 
         {/* Workspaces List */}
         {workspaces.length === 0 ? (
-          <Paper sx={{ p: 4, textAlign: 'center', borderRadius: '12px', backgroundColor: cardBg }}>
-            <PeopleIcon sx={{ fontSize: 64, color: theme.palette.grey[400], mb: 2 }} />
-            <Typography variant="h6" sx={{ mb: 1 }}>No workspaces yet</Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Paper sx={{ p: { xs: 3, md: 4 }, textAlign: 'center', borderRadius: '12px', backgroundColor: cardBg }}>
+            <PeopleIcon sx={{ fontSize: { xs: 48, md: 64 }, color: theme.palette.grey[400], mb: 2 }} />
+            <Typography variant="h6" sx={{ mb: 1, fontSize: { xs: '1.125rem', md: '1.25rem' } }}>
+              No workspaces yet
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontSize: { xs: '0.875rem', md: '0.875rem' } }}>
               Create a workspace to start collaborating with your team
             </Typography>
-            <Button variant="outlined" startIcon={<AddIcon />} onClick={() => setIsCreateOpen(true)}>
+            <Button 
+              variant="outlined" 
+              startIcon={<AddIcon />} 
+              onClick={() => setIsCreateOpen(true)}
+              fullWidth={isMobile}
+              sx={{ maxWidth: { xs: '100%', md: 'auto' } }}
+            >
               Create Your First Workspace
             </Button>
           </Paper>
@@ -252,7 +270,7 @@ const Workspaces = () => {
               <Paper
                 key={workspace._id}
                 sx={{
-                  p: 2,
+                  p: { xs: 1.5, md: 2 },
                   borderRadius: '12px',
                   backgroundColor: cardBg,
                   border: currentWorkspace?._id === workspace._id ? '2px solid #2563EB' : '1px solid transparent',
@@ -264,27 +282,47 @@ const Workspaces = () => {
                 }}
                 onClick={() => setSelectedWorkspace(workspace)}
               >
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <Avatar sx={{ bgcolor: '#2563EB', width: 48, height: 48 }}>
+                <Stack 
+                  direction={{ xs: 'column', md: 'row' }} 
+                  justifyContent="space-between" 
+                  alignItems={{ xs: 'flex-start', md: 'center' }}
+                  spacing={{ xs: 1.5, md: 0 }}
+                >
+                  <Stack direction="row" spacing={2} alignItems="center" sx={{ width: { xs: '100%', md: 'auto' } }}>
+                    <Avatar sx={{ bgcolor: '#2563EB', width: { xs: 40, md: 48 }, height: { xs: 40, md: 48 } }}>
                       {workspace.name.charAt(0).toUpperCase()}
                     </Avatar>
-                    <Box>
-                      <Typography variant="h6" fontWeight="600">{workspace.name}</Typography>
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        <Typography variant="body2" color="text.secondary">
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography variant="h6" fontWeight="600" sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
+                        {workspace.name}
+                      </Typography>
+                      <Stack 
+                        direction={{ xs: 'column', md: 'row' }} 
+                        spacing={{ xs: 0.5, md: 1 }} 
+                        alignItems={{ xs: 'flex-start', md: 'center' }}
+                        sx={{ mt: 0.5 }}
+                      >
+                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}>
                           {workspace.members.length} member{workspace.members.length !== 1 ? 's' : ''}
                         </Typography>
                         <Chip
                           label={workspace.members.find((m) => m.role)?.role || 'member'}
                           size="small"
                           color={roleColors[workspace.members[0]?.role || 'viewer']}
-                          sx={{ height: 20, fontSize: '0.7rem' }}
+                          sx={{ height: 20, fontSize: '0.7rem', width: 'fit-content' }}
                         />
                       </Stack>
                     </Box>
                   </Stack>
-                  <Stack direction="row" spacing={1}>
+                  <Stack 
+                    direction="row" 
+                    spacing={1} 
+                    sx={{ 
+                      width: { xs: '100%', md: 'auto' },
+                      justifyContent: { xs: 'flex-end', md: 'flex-start' },
+                      mt: { xs: 1, md: 0 },
+                    }}
+                  >
                     {currentWorkspace?._id !== workspace._id && (
                       <Button
                         size="small"
@@ -294,17 +332,19 @@ const Workspaces = () => {
                           setCurrentWorkspace(workspace);
                           enqueueSnackbar(`Switched to ${workspace.name}`, { variant: 'info' });
                         }}
+                        sx={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}
                       >
                         Switch
                       </Button>
                     )}
                     <IconButton
+                      size={isMobile ? 'small' : 'medium'}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleMenuOpen(e, workspace);
                       }}
                     >
-                      <MoreIcon />
+                      <MoreIcon fontSize={isMobile ? 'small' : 'medium'} />
                     </IconButton>
                   </Stack>
                 </Stack>
@@ -315,14 +355,24 @@ const Workspaces = () => {
 
         {/* Selected Workspace Members */}
         {selectedWorkspace && (
-          <Paper sx={{ p: 3, borderRadius: '12px', backgroundColor: cardBg }}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-              <Typography variant="h6">{selectedWorkspace.name} - Members</Typography>
+          <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: '12px', backgroundColor: cardBg }}>
+            <Stack 
+              direction={{ xs: 'column', md: 'row' }} 
+              justifyContent="space-between" 
+              alignItems={{ xs: 'flex-start', md: 'center' }}
+              spacing={{ xs: 2, md: 0 }}
+              sx={{ mb: 2 }}
+            >
+              <Typography variant="h6" sx={{ fontSize: { xs: '1.125rem', md: '1.25rem' } }}>
+                {selectedWorkspace.name} - Members
+              </Typography>
               <Button
                 variant="outlined"
                 startIcon={<InviteIcon />}
                 onClick={() => setIsInviteOpen(true)}
                 size="small"
+                fullWidth={isMobile}
+                sx={{ minWidth: { xs: '100%', md: 'auto' } }}
               >
                 Invite Member
               </Button>
@@ -332,91 +382,173 @@ const Workspaces = () => {
               <LoadingSpinner message="Loading members..." />
             ) : (
               <>
-                <TableContainer>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Member</TableCell>
-                        <TableCell>Role</TableCell>
-                        <TableCell>Joined</TableCell>
-                        <TableCell>Actions</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {membersData?.members.map((member) => (
-                        <TableRow key={member.userId}>
-                          <TableCell>
-                            <Stack direction="row" spacing={1} alignItems="center">
-                              <Avatar sx={{ width: 32, height: 32 }}>
-                                {member.displayName?.charAt(0) || member.email?.charAt(0)}
-                              </Avatar>
-                              <Box>
-                                <Typography variant="body2" fontWeight="500">
-                                  {member.displayName || 'Unknown'}
+                {isMobile ? (
+                  // Mobile: Card layout
+                  <Stack spacing={2}>
+                    {membersData?.members.map((member) => (
+                      <Paper
+                        key={member.userId}
+                        sx={{
+                          p: 2,
+                          borderRadius: '8px',
+                          backgroundColor: isDark ? theme.palette.background.default : '#f5f5f5',
+                        }}
+                      >
+                        <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={2}>
+                          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flex: 1, minWidth: 0 }}>
+                            <Avatar sx={{ width: 40, height: 40 }}>
+                              {member.displayName?.charAt(0) || member.email?.charAt(0)}
+                            </Avatar>
+                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                              <Typography variant="body2" fontWeight="500" sx={{ fontSize: '0.875rem' }}>
+                                {member.displayName || 'Unknown'}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {member.email}
+                              </Typography>
+                              <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
+                                <Chip
+                                  label={member.role}
+                                  size="small"
+                                  color={roleColors[member.role]}
+                                  sx={{ height: 20, fontSize: '0.7rem' }}
+                                />
+                                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                                  Joined {new Date(member.joinedAt).toLocaleDateString()}
                                 </Typography>
-                                <Typography variant="caption" color="text.secondary">
-                                  {member.email}
-                                </Typography>
-                              </Box>
-                            </Stack>
-                          </TableCell>
-                          <TableCell>
-                            <Chip
-                              label={member.role}
+                              </Stack>
+                            </Box>
+                          </Stack>
+                          {member.role !== 'owner' && (
+                            <IconButton
                               size="small"
-                              color={roleColors[member.role]}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            {new Date(member.joinedAt).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell>
-                            {member.role !== 'owner' && (
-                              <IconButton
-                                size="small"
-                                color="error"
-                                onClick={() => {
-                                  setConfirmDialog({
-                                    open: true,
-                                    title: 'Remove Member',
-                                    message: `Are you sure you want to remove ${member.displayName || member.email} from this workspace?`,
-                                    onConfirm: () => {
-                                      removeMemberMutation.mutate(member.userId);
-                                      setConfirmDialog((prev) => ({ ...prev, open: false }));
-                                    },
-                                  });
-                                }}
-                              >
-                                <DeleteIcon fontSize="small" />
-                              </IconButton>
-                            )}
-                          </TableCell>
+                              color="error"
+                              onClick={() => {
+                                setConfirmDialog({
+                                  open: true,
+                                  title: 'Remove Member',
+                                  message: `Are you sure you want to remove ${member.displayName || member.email} from this workspace?`,
+                                  onConfirm: () => {
+                                    removeMemberMutation.mutate(member.userId);
+                                    setConfirmDialog((prev) => ({ ...prev, open: false }));
+                                  },
+                                });
+                              }}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          )}
+                        </Stack>
+                      </Paper>
+                    ))}
+                  </Stack>
+                ) : (
+                  // Desktop: Table layout
+                  <TableContainer>
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Member</TableCell>
+                          <TableCell>Role</TableCell>
+                          <TableCell>Joined</TableCell>
+                          <TableCell>Actions</TableCell>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                      </TableHead>
+                      <TableBody>
+                        {membersData?.members.map((member) => (
+                          <TableRow key={member.userId}>
+                            <TableCell>
+                              <Stack direction="row" spacing={1} alignItems="center">
+                                <Avatar sx={{ width: 32, height: 32 }}>
+                                  {member.displayName?.charAt(0) || member.email?.charAt(0)}
+                                </Avatar>
+                                <Box>
+                                  <Typography variant="body2" fontWeight="500">
+                                    {member.displayName || 'Unknown'}
+                                  </Typography>
+                                  <Typography variant="caption" color="text.secondary">
+                                    {member.email}
+                                  </Typography>
+                                </Box>
+                              </Stack>
+                            </TableCell>
+                            <TableCell>
+                              <Chip
+                                label={member.role}
+                                size="small"
+                                color={roleColors[member.role]}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              {new Date(member.joinedAt).toLocaleDateString()}
+                            </TableCell>
+                            <TableCell>
+                              {member.role !== 'owner' && (
+                                <IconButton
+                                  size="small"
+                                  color="error"
+                                  onClick={() => {
+                                    setConfirmDialog({
+                                      open: true,
+                                      title: 'Remove Member',
+                                      message: `Are you sure you want to remove ${member.displayName || member.email} from this workspace?`,
+                                      onConfirm: () => {
+                                        removeMemberMutation.mutate(member.userId);
+                                        setConfirmDialog((prev) => ({ ...prev, open: false }));
+                                      },
+                                    });
+                                  }}
+                                >
+                                  <DeleteIcon fontSize="small" />
+                                </IconButton>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                )}
 
                 {membersData?.pendingInvites && membersData.pendingInvites.length > 0 && (
                   <Box sx={{ mt: 3 }}>
-                    <Typography variant="subtitle2" sx={{ mb: 1 }}>Pending Invites</Typography>
-                    {membersData.pendingInvites.map((invite) => (
-                      <Stack
-                        key={invite.email}
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center"
-                        sx={{ py: 1, borderBottom: '1px solid', borderColor: 'divider' }}
-                      >
-                        <Box>
-                          <Typography variant="body2">{invite.email}</Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            Expires: {new Date(invite.expiresAt).toLocaleDateString()}
-                          </Typography>
-                        </Box>
-                        <Chip label={invite.role} size="small" color={roleColors[invite.role]} />
-                      </Stack>
-                    ))}
+                    <Typography variant="subtitle2" sx={{ mb: 1, fontSize: { xs: '0.875rem', md: '0.875rem' } }}>
+                      Pending Invites
+                    </Typography>
+                    <Stack spacing={1.5}>
+                      {membersData.pendingInvites.map((invite) => (
+                        <Paper
+                          key={invite.email}
+                          sx={{
+                            p: { xs: 1.5, md: 2 },
+                            borderRadius: '8px',
+                            backgroundColor: isDark ? theme.palette.background.default : '#f5f5f5',
+                          }}
+                        >
+                          <Stack
+                            direction={{ xs: 'column', md: 'row' }}
+                            justifyContent="space-between"
+                            alignItems={{ xs: 'flex-start', md: 'center' }}
+                            spacing={{ xs: 1, md: 0 }}
+                          >
+                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                              <Typography variant="body2" sx={{ fontSize: { xs: '0.875rem', md: '0.875rem' }, wordBreak: 'break-word' }}>
+                                {invite.email}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', md: '0.75rem' } }}>
+                                Expires: {new Date(invite.expiresAt).toLocaleDateString()}
+                              </Typography>
+                            </Box>
+                            <Chip 
+                              label={invite.role} 
+                              size="small" 
+                              color={roleColors[invite.role]}
+                              sx={{ mt: { xs: 0.5, md: 0 }, alignSelf: { xs: 'flex-start', md: 'center' } }}
+                            />
+                          </Stack>
+                        </Paper>
+                      ))}
+                    </Stack>
                   </Box>
                 )}
               </>
@@ -426,7 +558,20 @@ const Workspaces = () => {
       </Stack>
 
       {/* Create Workspace Dialog */}
-      <Dialog open={isCreateOpen} onClose={() => setIsCreateOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog 
+        open={isCreateOpen} 
+        onClose={() => setIsCreateOpen(false)} 
+        maxWidth="sm" 
+        fullWidth
+        fullScreen={isMobile}
+        sx={{
+          '& .MuiDialog-paper': {
+            m: { xs: 0, md: 2 },
+            borderRadius: { xs: 0, md: '8px' },
+            maxHeight: { xs: '100%', md: '90vh' },
+          },
+        }}
+      >
         <DialogTitle>Create Workspace</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
@@ -469,7 +614,20 @@ const Workspaces = () => {
       </Dialog>
 
       {/* Invite Member Dialog */}
-      <Dialog open={isInviteOpen} onClose={() => setIsInviteOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog 
+        open={isInviteOpen} 
+        onClose={() => setIsInviteOpen(false)} 
+        maxWidth="sm" 
+        fullWidth
+        fullScreen={isMobile}
+        sx={{
+          '& .MuiDialog-paper': {
+            m: { xs: 0, md: 2 },
+            borderRadius: { xs: 0, md: '8px' },
+            maxHeight: { xs: '100%', md: '90vh' },
+          },
+        }}
+      >
         <DialogTitle>Invite Member</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>

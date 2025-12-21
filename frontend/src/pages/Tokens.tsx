@@ -18,6 +18,7 @@ import {
   TextField,
   TableContainer,
   useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Key as KeyIcon,
@@ -44,6 +45,7 @@ const Tokens = () => {
   const [generatedToken, setGeneratedToken] = useState('');
   const [tokenToDelete, setTokenToDelete] = useState<string | null>(null);
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isDark = theme.palette.mode === 'dark';
   const cardBg = isDark ? theme.palette.background.paper : '#ffffff';
   const codeBg = isDark ? 'rgba(0, 0, 0, 0.3)' : theme.palette.grey[100];
@@ -145,7 +147,7 @@ const Tokens = () => {
 
   return (
     <MainLayout>
-      <Stack spacing={3}>
+      <Stack spacing={3} sx={{ p: { xs: 2, md: 0 } }}>
         {/* Header */}
         <Box>
           <Typography
@@ -158,11 +160,17 @@ const Tokens = () => {
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               mb: 0.5,
+              fontSize: { xs: '1.75rem', md: '2.125rem' },
             }}
           >
             Tokens
           </Typography>
-          <Typography variant="body2" color="text.secondary" fontFamily="'Inter', sans-serif">
+          <Typography 
+            variant="body2" 
+            color="text.secondary" 
+            fontFamily="'Inter', sans-serif"
+            sx={{ fontSize: { xs: '0.875rem', md: '0.875rem' } }}
+          >
             Manage your tokens for CLI authentication
           </Typography>
         </Box>
@@ -184,12 +192,14 @@ const Tokens = () => {
               startIcon={<AddIcon />}
               variant="contained"
               onClick={() => setIsNewTokenOpen(true)}
+              fullWidth={isMobile}
               sx={{
                 alignSelf: { xs: 'stretch', sm: 'auto' },
                 background: 'linear-gradient(135deg, #2563EB 0%, #3B82F6 100%)',
                 '&:hover': {
                   background: 'linear-gradient(135deg, #1D4ED8 0%, #2563EB 100%)',
                 },
+                minWidth: { xs: '100%', md: 'auto' },
               }}
             >
               Generate New Token
@@ -219,7 +229,75 @@ const Tokens = () => {
                 Create Your First Token
               </Button>
             </Box>
+          ) : isMobile ? (
+            // Mobile: Card layout
+            <Stack spacing={2}>
+              {tokensData?.apiKeys?.map((token: any) => (
+                <Paper
+                  key={token._id}
+                  sx={{
+                    p: 2,
+                    borderRadius: '8px',
+                    backgroundColor: isDark ? theme.palette.background.default : '#f5f5f5',
+                  }}
+                >
+                  <Stack spacing={1.5}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '0.875rem', mb: 0.5 }}>
+                          {token.name}
+                        </Typography>
+                        <Box
+                          component="code"
+                          sx={{
+                            fontSize: '0.7rem',
+                            backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : theme.palette.grey[100],
+                            px: 1,
+                            py: 0.5,
+                            borderRadius: '4px',
+                            display: 'block',
+                            wordBreak: 'break-all',
+                            fontFamily: 'monospace',
+                          }}
+                        >
+                          {token.keyPreview}
+                        </Box>
+                      </Box>
+                    </Stack>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" spacing={1}>
+                      <Chip
+                        label={token.isActive ? 'Active' : 'Revoked'}
+                        color={token.isActive ? 'success' : 'error'}
+                        size="small"
+                        sx={{ fontSize: '0.7rem', height: 22 }}
+                      />
+                      <Typography variant="caption" sx={{ fontSize: '0.75rem', color: theme.palette.grey[600] }}>
+                        {new Date(token.createdAt).toLocaleDateString()}
+                      </Typography>
+                    </Stack>
+                    <Stack direction="row" spacing={1} justifyContent="flex-end">
+                      <IconButton
+                        size="small"
+                        onClick={() => regenerateTokenMutation.mutate(token._id)}
+                        disabled={regenerateTokenMutation.isPending}
+                        title="Regenerate token"
+                      >
+                        <RefreshIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => handleDeleteToken(token._id)}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Stack>
+                  </Stack>
+                </Paper>
+              ))}
+            </Stack>
           ) : (
+            // Desktop: Table layout
             <TableContainer sx={{ maxHeight: 420, overflowX: 'auto' }}>
               <Table size="small">
                 <TableHead>
@@ -287,36 +365,86 @@ const Tokens = () => {
         </Paper>
 
         {/* How to Use Section */}
-        <Paper variant="outlined" sx={{ p: 3, borderRadius: '12px', backgroundColor: cardBg }}>
-          <Typography variant="h6" sx={{ mb: 2, fontSize: '1rem' }}>How to Use Your Token</Typography>
+        <Paper variant="outlined" sx={{ p: { xs: 2, md: 3 }, borderRadius: '12px', backgroundColor: cardBg }}>
+          <Typography variant="h6" sx={{ mb: 2, fontSize: { xs: '0.9375rem', md: '1rem' } }}>
+            How to Use Your Token
+          </Typography>
           <Stack spacing={3}>
             <Box>
-              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>Step 1: Install the Taggr CLI</Typography>
-              <Typography variant="body2" sx={{ color: theme.palette.grey[600], mb: 1 }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1, fontSize: { xs: '0.875rem', md: '0.875rem' } }}>
+                Step 1: Install the Taggr CLI
+              </Typography>
+              <Typography variant="body2" sx={{ color: theme.palette.grey[600], mb: 1, fontSize: { xs: '0.8125rem', md: '0.875rem' } }}>
                 Open your terminal and run:
               </Typography>
-              <Box component="pre" sx={{ display: 'block', p: 2, m: 0, backgroundColor: codeBg, borderRadius: '8px', fontSize: '0.875rem', fontFamily: 'monospace', color: codeColor, whiteSpace: 'pre-wrap' }}>
+              <Box 
+                component="pre" 
+                sx={{ 
+                  display: 'block', 
+                  p: { xs: 1.5, md: 2 }, 
+                  m: 0, 
+                  backgroundColor: codeBg, 
+                  borderRadius: '8px', 
+                  fontSize: { xs: '0.75rem', md: '0.875rem' }, 
+                  fontFamily: 'monospace', 
+                  color: codeColor, 
+                  whiteSpace: 'pre-wrap',
+                  overflowX: 'auto',
+                }}
+              >
                 npm install -g @taggr/cli
               </Box>
             </Box>
             <Box>
-              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>Step 2: Authenticate</Typography>
-              <Typography variant="body2" sx={{ color: theme.palette.grey[600], mb: 1 }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1, fontSize: { xs: '0.875rem', md: '0.875rem' } }}>
+                Step 2: Authenticate
+              </Typography>
+              <Typography variant="body2" sx={{ color: theme.palette.grey[600], mb: 1, fontSize: { xs: '0.8125rem', md: '0.875rem' } }}>
                 Copy your token from above and run:
               </Typography>
-              <Box component="pre" sx={{ display: 'block', p: 2, m: 0, backgroundColor: codeBg, borderRadius: '8px', fontSize: '0.875rem', fontFamily: 'monospace', color: codeColor, whiteSpace: 'pre-wrap' }}>
+              <Box 
+                component="pre" 
+                sx={{ 
+                  display: 'block', 
+                  p: { xs: 1.5, md: 2 }, 
+                  m: 0, 
+                  backgroundColor: codeBg, 
+                  borderRadius: '8px', 
+                  fontSize: { xs: '0.75rem', md: '0.875rem' }, 
+                  fontFamily: 'monospace', 
+                  color: codeColor, 
+                  whiteSpace: 'pre-wrap',
+                  overflowX: 'auto',
+                }}
+              >
                 taggr login {'<your-token>'}
               </Box>
-              <Typography variant="body2" sx={{ color: theme.palette.grey[500], mt: 1, fontSize: '0.8rem' }}>
+              <Typography variant="body2" sx={{ color: theme.palette.grey[500], mt: 1, fontSize: { xs: '0.75rem', md: '0.8rem' } }}>
                 You only need to do this once. Your token is saved locally.
               </Typography>
             </Box>
             <Box>
-              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>Step 3: Pull Your Labels</Typography>
-              <Typography variant="body2" sx={{ color: theme.palette.grey[600], mb: 1 }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1, fontSize: { xs: '0.875rem', md: '0.875rem' } }}>
+                Step 3: Pull Your Labels
+              </Typography>
+              <Typography variant="body2" sx={{ color: theme.palette.grey[600], mb: 1, fontSize: { xs: '0.8125rem', md: '0.875rem' } }}>
                 Navigate to your project folder and run:
               </Typography>
-              <Box component="pre" sx={{ display: 'block', p: 2, m: 0, backgroundColor: codeBg, borderRadius: '8px', fontSize: '0.875rem', fontFamily: 'monospace', color: codeColor, whiteSpace: 'pre-wrap' }}>
+              <Box 
+                component="pre" 
+                sx={{ 
+                  display: 'block', 
+                  p: { xs: 1.5, md: 2 }, 
+                  m: 0, 
+                  backgroundColor: codeBg, 
+                  borderRadius: '8px', 
+                  fontSize: { xs: '0.75rem', md: '0.875rem' }, 
+                  fontFamily: 'monospace', 
+                  color: codeColor, 
+                  whiteSpace: 'pre-wrap',
+                  overflowX: 'auto',
+                }}
+              >
                 taggr pull --all
               </Box>
               <Typography variant="body2" sx={{ color: theme.palette.grey[500], mt: 1, fontSize: '0.8rem' }}>
@@ -324,8 +452,24 @@ const Tokens = () => {
               </Typography>
             </Box>
             <Box>
-              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>Step 4: Use in Your Code</Typography>
-              <Box component="pre" sx={{ display: 'block', p: 2, m: 0, backgroundColor: codeBg, borderRadius: '8px', fontSize: '0.875rem', fontFamily: 'monospace', color: codeColor, whiteSpace: 'pre-wrap' }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1, fontSize: { xs: '0.875rem', md: '0.875rem' } }}>
+                Step 4: Use in Your Code
+              </Typography>
+              <Box 
+                component="pre" 
+                sx={{ 
+                  display: 'block', 
+                  p: { xs: 1.5, md: 2 }, 
+                  m: 0, 
+                  backgroundColor: codeBg, 
+                  borderRadius: '8px', 
+                  fontSize: { xs: '0.75rem', md: '0.875rem' }, 
+                  fontFamily: 'monospace', 
+                  color: codeColor, 
+                  whiteSpace: 'pre-wrap',
+                  overflowX: 'auto',
+                }}
+              >
 {`import labels from './taggr/labels.json';
 
 console.log(labels.welcomeMessage);
@@ -336,14 +480,30 @@ const { myLabel, submitButton } = labels;`}
               </Box>
             </Box>
             <Box>
-              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>Step 5: Keep Labels in Sync</Typography>
-              <Typography variant="body2" sx={{ color: theme.palette.grey[600], mb: 1 }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1, fontSize: { xs: '0.875rem', md: '0.875rem' } }}>
+                Step 5: Keep Labels in Sync
+              </Typography>
+              <Typography variant="body2" sx={{ color: theme.palette.grey[600], mb: 1, fontSize: { xs: '0.8125rem', md: '0.875rem' } }}>
                 Run this command anytime you update labels in the dashboard:
               </Typography>
-              <Box component="pre" sx={{ display: 'block', p: 2, m: 0, backgroundColor: codeBg, borderRadius: '8px', fontSize: '0.875rem', fontFamily: 'monospace', color: codeColor, whiteSpace: 'pre-wrap' }}>
+              <Box 
+                component="pre" 
+                sx={{ 
+                  display: 'block', 
+                  p: { xs: 1.5, md: 2 }, 
+                  m: 0, 
+                  backgroundColor: codeBg, 
+                  borderRadius: '8px', 
+                  fontSize: { xs: '0.75rem', md: '0.875rem' }, 
+                  fontFamily: 'monospace', 
+                  color: codeColor, 
+                  whiteSpace: 'pre-wrap',
+                  overflowX: 'auto',
+                }}
+              >
                 taggr pull --all
               </Box>
-              <Typography variant="body2" sx={{ color: theme.palette.grey[500], mt: 1, fontSize: '0.8rem' }}>
+              <Typography variant="body2" sx={{ color: theme.palette.grey[500], mt: 1, fontSize: { xs: '0.75rem', md: '0.8rem' } }}>
                 Or use <code style={{ backgroundColor: codeBg, padding: '2px 4px', borderRadius: '4px' }}>taggr sync</code> for the same result.
               </Typography>
             </Box>
@@ -351,9 +511,37 @@ const { myLabel, submitButton } = labels;`}
         </Paper>
 
         {/* Other Commands Section */}
-        <Paper variant="outlined" sx={{ p: 3, borderRadius: '12px', backgroundColor: cardBg }}>
-          <Typography variant="h6" sx={{ mb: 2, fontSize: '1rem' }}>All Available Commands</Typography>
-          <Box component="table" sx={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
+        <Paper variant="outlined" sx={{ p: { xs: 2, md: 3 }, borderRadius: '12px', backgroundColor: cardBg }}>
+          <Typography variant="h6" sx={{ mb: 2, fontSize: { xs: '0.9375rem', md: '1rem' } }}>
+            All Available Commands
+          </Typography>
+          {isMobile ? (
+            // Mobile: Stack layout
+            <Stack spacing={2}>
+              {[
+                { cmd: 'taggr whoami', desc: 'Check which account you\'re logged in as' },
+                { cmd: 'taggr list', desc: 'View all your labels' },
+                { cmd: 'taggr pull --all', desc: 'Pull all labels to your project' },
+                { cmd: 'taggr sync', desc: 'Force sync all labels (alias for pull --all)' },
+                { cmd: 'taggr check', desc: 'Check if labels are up-to-date' },
+                { cmd: 'taggr check --strict', desc: 'Fail build if labels are outdated (for CI/CD)' },
+                { cmd: 'taggr watch', desc: 'Auto-sync when labels change in cloud' },
+                { cmd: 'taggr status', desc: 'Show sync status and label versions' },
+                { cmd: 'taggr logout', desc: 'Sign out from CLI' },
+              ].map((item, idx) => (
+                <Box key={idx} sx={{ p: 1.5, borderRadius: '8px', backgroundColor: isDark ? theme.palette.background.default : '#f5f5f5' }}>
+                  <Typography variant="body2" sx={{ fontFamily: 'monospace', color: codeColor, mb: 0.5, fontSize: '0.75rem' }}>
+                    {item.cmd}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: theme.palette.grey[600], fontSize: '0.8125rem' }}>
+                    {item.desc}
+                  </Typography>
+                </Box>
+              ))}
+            </Stack>
+          ) : (
+            // Desktop: Table layout
+            <Box component="table" sx={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
             <Box component="thead">
               <Box component="tr">
                 <Box component="th" sx={{ textAlign: 'left', p: 1, borderBottom: `1px solid ${theme.palette.divider}` }}>Command</Box>
@@ -398,44 +586,85 @@ const { myLabel, submitButton } = labels;`}
                 <Box component="td" sx={{ p: 1, color: theme.palette.grey[600] }}>Sign out from CLI</Box>
               </Box>
             </Box>
-          </Box>
-          <Typography variant="body2" sx={{ color: theme.palette.grey[500], mt: 2, fontSize: '0.8rem' }}>
+            </Box>
+          )}
+          <Typography variant="body2" sx={{ color: theme.palette.grey[500], mt: 2, fontSize: { xs: '0.75rem', md: '0.8rem' } }}>
             Tip: Add <code style={{ backgroundColor: codeBg, padding: '2px 4px', borderRadius: '4px' }}>./taggr</code> to your .gitignore if you don't want to commit generated files. The CLI tracks versions automatically in <code style={{ backgroundColor: codeBg, padding: '2px 4px', borderRadius: '4px' }}>.taggr.json</code>.
           </Typography>
         </Paper>
 
         {/* Advanced Features Section */}
-        <Paper variant="outlined" sx={{ p: 3, borderRadius: '12px', backgroundColor: cardBg }}>
-          <Typography variant="h6" sx={{ mb: 2, fontSize: '1rem' }}>Advanced Features</Typography>
+        <Paper variant="outlined" sx={{ p: { xs: 2, md: 3 }, borderRadius: '12px', backgroundColor: cardBg }}>
+          <Typography variant="h6" sx={{ mb: 2, fontSize: { xs: '0.9375rem', md: '1rem' } }}>
+            Advanced Features
+          </Typography>
           <Stack spacing={2}>
             <Box>
-              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>Version Tracking</Typography>
-              <Typography variant="body2" sx={{ color: theme.palette.grey[600], mb: 1 }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1, fontSize: { xs: '0.875rem', md: '0.875rem' } }}>
+                Version Tracking
+              </Typography>
+              <Typography variant="body2" sx={{ color: theme.palette.grey[600], mb: 1, fontSize: { xs: '0.8125rem', md: '0.875rem' } }}>
                 The CLI automatically tracks which version of each label you're using. This ensures your team stays in sync and prevents outdated labels in production.
               </Typography>
             </Box>
             <Box>
-              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>Build-Time Validation</Typography>
-              <Typography variant="body2" sx={{ color: theme.palette.grey[600], mb: 1 }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1, fontSize: { xs: '0.875rem', md: '0.875rem' } }}>
+                Build-Time Validation
+              </Typography>
+              <Typography variant="body2" sx={{ color: theme.palette.grey[600], mb: 1, fontSize: { xs: '0.8125rem', md: '0.875rem' } }}>
                 Use <code style={{ backgroundColor: codeBg, padding: '2px 4px', borderRadius: '4px' }}>taggr check --strict</code> in your CI/CD pipeline to fail builds if labels are outdated. This prevents deploying stale labels to production.
               </Typography>
-              <Box component="pre" sx={{ display: 'block', p: 2, m: 0, backgroundColor: codeBg, borderRadius: '8px', fontSize: '0.875rem', fontFamily: 'monospace', color: codeColor, whiteSpace: 'pre-wrap', mt: 1 }}>
+              <Box 
+                component="pre" 
+                sx={{ 
+                  display: 'block', 
+                  p: { xs: 1.5, md: 2 }, 
+                  m: 0, 
+                  backgroundColor: codeBg, 
+                  borderRadius: '8px', 
+                  fontSize: { xs: '0.75rem', md: '0.875rem' }, 
+                  fontFamily: 'monospace', 
+                  color: codeColor, 
+                  whiteSpace: 'pre-wrap', 
+                  mt: 1,
+                  overflowX: 'auto',
+                }}
+              >
 {`# In your CI/CD pipeline
 taggr check --strict`}
               </Box>
             </Box>
             <Box>
-              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>Auto-Sync Mode</Typography>
-              <Typography variant="body2" sx={{ color: theme.palette.grey[600], mb: 1 }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1, fontSize: { xs: '0.875rem', md: '0.875rem' } }}>
+                Auto-Sync Mode
+              </Typography>
+              <Typography variant="body2" sx={{ color: theme.palette.grey[600], mb: 1, fontSize: { xs: '0.8125rem', md: '0.875rem' } }}>
                 Run <code style={{ backgroundColor: codeBg, padding: '2px 4px', borderRadius: '4px' }}>taggr watch</code> to automatically sync labels when they change in the cloud. Perfect for development!
               </Typography>
-              <Box component="pre" sx={{ display: 'block', p: 2, m: 0, backgroundColor: codeBg, borderRadius: '8px', fontSize: '0.875rem', fontFamily: 'monospace', color: codeColor, whiteSpace: 'pre-wrap', mt: 1 }}>
+              <Box 
+                component="pre" 
+                sx={{ 
+                  display: 'block', 
+                  p: { xs: 1.5, md: 2 }, 
+                  m: 0, 
+                  backgroundColor: codeBg, 
+                  borderRadius: '8px', 
+                  fontSize: { xs: '0.75rem', md: '0.875rem' }, 
+                  fontFamily: 'monospace', 
+                  color: codeColor, 
+                  whiteSpace: 'pre-wrap', 
+                  mt: 1,
+                  overflowX: 'auto',
+                }}
+              >
                 taggr watch
               </Box>
             </Box>
             <Box>
-              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>Check Sync Status</Typography>
-              <Typography variant="body2" sx={{ color: theme.palette.grey[600], mb: 1 }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1, fontSize: { xs: '0.875rem', md: '0.875rem' } }}>
+                Check Sync Status
+              </Typography>
+              <Typography variant="body2" sx={{ color: theme.palette.grey[600], mb: 1, fontSize: { xs: '0.8125rem', md: '0.875rem' } }}>
                 Use <code style={{ backgroundColor: codeBg, padding: '2px 4px', borderRadius: '4px' }}>taggr status</code> to see when labels were last synced and which versions you're using.
               </Typography>
             </Box>

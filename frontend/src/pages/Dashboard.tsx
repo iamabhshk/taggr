@@ -8,6 +8,7 @@ import {
   useTheme,
   Grid,
   Chip,
+  useMediaQuery,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -30,6 +31,7 @@ const Dashboard = () => {
   const [selectedLabel, setSelectedLabel] = useState<Label | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
 
   const {
@@ -71,7 +73,7 @@ const Dashboard = () => {
 
   return (
     <MainLayout>
-      <Stack spacing={3}>
+      <Stack spacing={3} sx={{ p: { xs: 2, md: 0 } }}>
         {/* Header */}
         <Box>
           <Typography
@@ -84,11 +86,17 @@ const Dashboard = () => {
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               mb: 0.5,
+              fontSize: { xs: '1.75rem', md: '2.125rem' },
             }}
           >
             Dashboard Overview
           </Typography>
-          <Typography variant="body2" color="text.secondary" fontFamily="'Inter', sans-serif">
+          <Typography 
+            variant="body2" 
+            color="text.secondary" 
+            fontFamily="'Inter', sans-serif"
+            sx={{ fontSize: { xs: '0.875rem', md: '0.875rem' } }}
+          >
             Manage and track your labels
           </Typography>
         </Box>
@@ -160,10 +168,10 @@ const Dashboard = () => {
                     },
                   }}
                 >
-                  <CardContent sx={{ p: 1.5 }}>
+                  <CardContent sx={{ p: { xs: 1.25, md: 1.5 } }}>
                     <Stack spacing={1}>
                       <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-                        <Box>
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
                           <Typography
                             variant="caption"
                             sx={{
@@ -171,6 +179,7 @@ const Dashboard = () => {
                               fontFamily: "'Inter', sans-serif",
                               fontWeight: 600,
                               letterSpacing: '0.5px',
+                              fontSize: { xs: '0.7rem', md: '0.75rem' },
                             }}
                           >
                             {stat.label}
@@ -182,6 +191,7 @@ const Dashboard = () => {
                               mt: 0.25,
                               fontFamily: "'Inter', sans-serif",
                               color: 'text.primary',
+                              fontSize: { xs: '1.25rem', md: '1.5rem' },
                             }}
                           >
                             {stat.value}
@@ -189,26 +199,29 @@ const Dashboard = () => {
                         </Box>
                         <Box
                           sx={{
-                            width: 36,
-                            height: 36,
+                            width: { xs: 32, md: 36 },
+                            height: { xs: 32, md: 36 },
                             borderRadius: 1.5,
                             background: stat.gradient,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             boxShadow: '0 2px 8px rgba(37, 99, 235, 0.15)',
+                            flexShrink: 0,
+                            ml: 1,
                           }}
                         >
-                          <IconComponent sx={{ color: 'white', fontSize: 18 }} />
+                          <IconComponent sx={{ color: 'white', fontSize: { xs: 16, md: 18 } }} />
                         </Box>
                       </Stack>
-                      <Stack direction="row" spacing={1} alignItems="center">
+                      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
                         <Typography
                           variant="body2"
                           fontWeight="600"
                           sx={{
                             color: stat.growth >= 0 ? 'success.main' : 'error.main',
                             fontFamily: "'Inter', sans-serif",
+                            fontSize: { xs: '0.75rem', md: '0.875rem' },
                           }}
                         >
                           {stat.growth >= 0 ? '↗' : '↘'} {Math.abs(stat.growth)}%
@@ -218,6 +231,7 @@ const Dashboard = () => {
                           sx={{
                             color: 'text.secondary',
                             fontFamily: "'Inter', sans-serif",
+                            fontSize: { xs: '0.75rem', md: '0.875rem' },
                           }}
                         >
                           vs last month
@@ -233,14 +247,21 @@ const Dashboard = () => {
         )}
 
         {/* Recent Labels Section */}
-        <Box sx={{ mt: 4 }}>
-          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+        <Box sx={{ mt: { xs: 3, md: 4 } }}>
+          <Stack 
+            direction={{ xs: 'column', sm: 'row' }} 
+            justifyContent="space-between" 
+            alignItems={{ xs: 'flex-start', sm: 'center' }}
+            spacing={{ xs: 1, sm: 0 }}
+            sx={{ mb: { xs: 2, md: 3 } }}
+          >
             <Typography
               variant="h5"
               fontWeight="600"
               sx={{
                 fontFamily: "'Inter', sans-serif",
                 color: 'text.primary',
+                fontSize: { xs: '1.25rem', md: '1.5rem' },
               }}
             >
               Recent Labels
@@ -253,6 +274,8 @@ const Dashboard = () => {
                   color: '#2563EB',
                   fontFamily: "'Inter', sans-serif",
                   textTransform: 'none',
+                  fontSize: { xs: '0.875rem', md: '0.875rem' },
+                  alignSelf: { xs: 'flex-start', sm: 'auto' },
                 }}
               >
                 View All
@@ -279,13 +302,13 @@ const Dashboard = () => {
             />
           ) : (
             // Labels Grid
-            <Grid container spacing={2}>
+            <Grid container spacing={{ xs: 1.5, md: 2 }}>
               {labelsData.labels.slice(0, 6).map((label: Label) => (
                 <Grid item xs={12} sm={6} md={4} key={label._id}>
                   <Card
                     sx={{
                       borderRadius: '12px',
-                      p: 2,
+                      p: { xs: 1.5, md: 2 },
                       background: theme.palette.mode === 'dark'
                         ? 'rgba(15, 23, 42, 0.95)'
                         : 'rgba(255, 255, 255, 0.95)',
@@ -309,6 +332,7 @@ const Dashboard = () => {
                         fontFamily: "'Inter', sans-serif",
                         mb: 1,
                         color: 'text.primary',
+                        fontSize: { xs: '0.9375rem', md: '1rem' },
                       }}
                     >
                       {label.displayName}
@@ -323,6 +347,7 @@ const Dashboard = () => {
                         display: '-webkit-box',
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical',
+                        fontSize: { xs: '0.8125rem', md: '0.875rem' },
                       }}
                     >
                       {label.value}
@@ -335,7 +360,7 @@ const Dashboard = () => {
                             size="small"
                             sx={{
                               height: 20,
-                              fontSize: '0.65rem',
+                              fontSize: { xs: '0.6rem', md: '0.65rem' },
                               backgroundColor: theme.palette.mode === 'dark' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(37, 99, 235, 0.1)',
                               color: theme.palette.mode === 'dark' ? '#93c5fd' : '#2563EB',
                             }}
@@ -348,7 +373,7 @@ const Dashboard = () => {
                             size="small"
                             sx={{
                               height: 20,
-                              fontSize: '0.65rem',
+                              fontSize: { xs: '0.6rem', md: '0.65rem' },
                               backgroundColor: theme.palette.mode === 'dark' ? 'rgba(37, 99, 235, 0.2)' : 'rgba(37, 99, 235, 0.1)',
                               color: theme.palette.mode === 'dark' ? '#60a5fa' : '#2563EB',
                             }}

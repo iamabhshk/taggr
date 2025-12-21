@@ -17,6 +17,32 @@ export default defineConfig({
       '@/styles': path.resolve(__dirname, './src/styles'),
     },
   },
+  build: {
+    // Enable code splitting
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Separate vendor chunks for better caching
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'mui-vendor': ['@mui/material', '@mui/icons-material'],
+          'query-vendor': ['@tanstack/react-query'],
+          'firebase-vendor': ['firebase/app', 'firebase/auth'],
+        },
+      },
+    },
+    // Optimize chunk size
+    chunkSizeWarningLimit: 1000,
+    // Minify - use terser if available, fallback to esbuild
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true, // Remove console.log in production
+        drop_debugger: true, // Remove debugger statements
+      },
+    },
+    // Source maps for better error tracking in production
+    sourcemap: false, // Set to true if you need source maps in production
+  },
   server: {
     port: 3000,
     headers: {

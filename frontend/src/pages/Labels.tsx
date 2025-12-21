@@ -14,6 +14,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -57,6 +58,7 @@ const Labels = () => {
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isDark = theme.palette.mode === 'dark';
 
   // Debounce search input
@@ -133,13 +135,13 @@ const Labels = () => {
 
   return (
     <MainLayout>
-      <Box>
+      <Box sx={{ p: { xs: 2, md: 0 } }}>
         {/* Search and Actions */}
         <MotionStack
           direction={{ xs: 'column', sm: 'row' }}
           spacing={2}
           sx={{
-            mb: 3,
+            mb: { xs: 2, md: 3 },
             alignItems: { xs: 'stretch', sm: 'center' },
           }}
           initial={{ opacity: 0, y: -20 }}
@@ -220,6 +222,7 @@ const Labels = () => {
             size="small"
             startIcon={<AddIcon sx={{ fontSize: '1rem' }} />}
             onClick={handleCreateNew}
+            fullWidth={isMobile}
             sx={{
               borderRadius: '6px',
               fontSize: '0.8rem',
@@ -262,7 +265,7 @@ const Labels = () => {
         ) : (
           <Grid
             container
-            spacing={2}
+            spacing={{ xs: 1.5, md: 2 }}
           >
             {labels.map((label: Label) => (
               <Grid item xs={12} sm={6} md={4} key={label._id}>
@@ -270,12 +273,12 @@ const Labels = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-                  whileHover={{ scale: 1.02 }}
+                  whileHover={{ scale: isMobile ? 1 : 1.02 }}
                 >
                   <Paper
                     sx={{
                       borderRadius: '12px',
-                      p: 2,
+                      p: { xs: 1.5, md: 2 },
                       background: isDark
                         ? 'rgba(15, 23, 42, 0.95)'
                         : 'rgba(255, 255, 255, 0.95)',
@@ -293,7 +296,7 @@ const Labels = () => {
                     onClick={() => handleEdit(label)}
                   >
                     <Stack spacing={1.5}>
-                      <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                      <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1}>
                         <Typography
                           variant="subtitle1"
                           fontWeight="600"
@@ -301,13 +304,15 @@ const Labels = () => {
                             fontFamily: "'Inter', sans-serif",
                             color: 'text.primary',
                             flex: 1,
+                            minWidth: 0,
+                            fontSize: { xs: '0.9375rem', md: '1rem' },
                           }}
                         >
                           {label.displayName}
                         </Typography>
-                        <Stack direction="row" spacing={0.5} onClick={(e) => e.stopPropagation()}>
+                        <Stack direction="row" spacing={0.5} onClick={(e) => e.stopPropagation()} sx={{ flexShrink: 0 }}>
                           <IconButton
-                            size="small"
+                            size={isMobile ? 'small' : 'small'}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleEdit(label);
@@ -315,15 +320,15 @@ const Labels = () => {
                             sx={{
                               transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                               '&:hover': {
-                                transform: 'scale(1.1)',
+                                transform: isMobile ? 'none' : 'scale(1.1)',
                                 backgroundColor: isDark ? 'rgba(37, 99, 235, 0.2)' : 'rgba(37, 99, 235, 0.1)',
                               },
                             }}
                           >
-                            <EditIcon fontSize="small" />
+                            <EditIcon fontSize={isMobile ? 'small' : 'small'} />
                           </IconButton>
                           <IconButton
-                            size="small"
+                            size={isMobile ? 'small' : 'small'}
                             color="error"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -333,11 +338,11 @@ const Labels = () => {
                             sx={{
                               transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                               '&:hover': {
-                                transform: 'scale(1.1)',
+                                transform: isMobile ? 'none' : 'scale(1.1)',
                               },
                             }}
                           >
-                            <DeleteIcon fontSize="small" />
+                            <DeleteIcon fontSize={isMobile ? 'small' : 'small'} />
                           </IconButton>
                         </Stack>
                       </Stack>
@@ -351,6 +356,7 @@ const Labels = () => {
                           display: '-webkit-box',
                           WebkitLineClamp: 2,
                           WebkitBoxOrient: 'vertical',
+                          fontSize: { xs: '0.8125rem', md: '0.875rem' },
                         }}
                       >
                         {label.value}
@@ -363,7 +369,7 @@ const Labels = () => {
                               size="small"
                               sx={{
                                 height: 20,
-                                fontSize: '0.65rem',
+                                fontSize: { xs: '0.6rem', md: '0.65rem' },
                                 backgroundColor: isDark ? 'rgba(59, 130, 246, 0.2)' : 'rgba(37, 99, 235, 0.1)',
                                 color: isDark ? '#93c5fd' : '#2563EB',
                               }}
@@ -376,7 +382,7 @@ const Labels = () => {
                               size="small"
                               sx={{
                                 height: 20,
-                                fontSize: '0.65rem',
+                                fontSize: { xs: '0.6rem', md: '0.65rem' },
                                 backgroundColor: isDark ? 'rgba(37, 99, 235, 0.2)' : 'rgba(37, 99, 235, 0.1)',
                                 color: isDark ? '#60a5fa' : '#2563EB',
                               }}
@@ -384,7 +390,12 @@ const Labels = () => {
                           ))}
                         </Stack>
                       )}
-                      <Stack direction="row" spacing={2} sx={{ fontSize: '0.75rem', color: mutedColor }} flexWrap="wrap">
+                      <Stack 
+                        direction={{ xs: 'column', sm: 'row' }} 
+                        spacing={{ xs: 0.5, sm: 2 }} 
+                        sx={{ fontSize: { xs: '0.7rem', md: '0.75rem' }, color: mutedColor }} 
+                        flexWrap="wrap"
+                      >
                         <Typography variant="caption">
                           {label.metadata.downloads || 0} pulls
                         </Typography>

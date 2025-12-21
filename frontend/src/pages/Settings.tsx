@@ -7,6 +7,7 @@ import {
   Stack,
   Button,
   useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Download as DownloadIcon,
@@ -48,6 +49,7 @@ const Settings = () => {
   const [tabValue, setTabValue] = useState(0);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   // Export labels mutation
   const exportMutation = useMutation({
@@ -109,12 +111,17 @@ const Settings = () => {
             <Tabs
               value={tabValue}
               onChange={(_, newValue) => setTabValue(newValue)}
+              variant={isMobile ? 'scrollable' : 'standard'}
+              scrollButtons={isMobile ? 'auto' : false}
               sx={{
                 borderBottom: 1,
                 borderColor: 'divider',
-                px: 2,
+                px: { xs: 1, md: 2 },
                 '& .MuiTab-root': {
                   color: isDark ? theme.palette.text.secondary : '#2563EB',
+                  fontSize: { xs: '0.875rem', md: '0.875rem' },
+                  minWidth: { xs: 'auto', md: 72 },
+                  px: { xs: 1.5, md: 3 },
                 },
                 '& .Mui-selected': {
                   color: '#2563EB !important',
@@ -129,13 +136,13 @@ const Settings = () => {
             </Tabs>
 
             <TabPanel value={tabValue} index={0}>
-              <Box sx={{ px: 2 }}>
+              <Box sx={{ px: { xs: 1, md: 2 } }}>
                 <ProfileSettings />
               </Box>
             </TabPanel>
 
             <TabPanel value={tabValue} index={1}>
-              <Stack spacing={3} sx={{ px: 2, pb: 2 }}>
+              <Stack spacing={3} sx={{ px: { xs: 1, md: 2 }, pb: 2 }}>
                 <Paper
                   variant="outlined"
                   sx={{
@@ -145,11 +152,22 @@ const Settings = () => {
                   }}
                 >
                   <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
-                    <DownloadIcon sx={{ color: theme.palette.info.main }} />
-                    <Typography variant="h6">Export Data</Typography>
+                    <DownloadIcon sx={{ color: theme.palette.info.main, fontSize: { xs: '1.25rem', md: '1.5rem' } }} />
+                    <Typography 
+                      variant="h6"
+                      sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}
+                    >
+                      Export Data
+                    </Typography>
                   </Stack>
                   <Stack spacing={2}>
-                    <Typography variant="body2" sx={{ color: isDark ? theme.palette.text.secondary : theme.palette.grey[600] }}>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        color: isDark ? theme.palette.text.secondary : theme.palette.grey[600],
+                        fontSize: { xs: '0.8125rem', md: '0.875rem' },
+                      }}
+                    >
                       Export all your labels as a JSON file. This includes label names, values, descriptions, and metadata.
                     </Typography>
                     <Button
@@ -157,12 +175,14 @@ const Settings = () => {
                       variant="contained"
                       onClick={() => exportMutation.mutate()}
                       disabled={exportMutation.isPending}
+                      fullWidth={isMobile}
                       sx={{
-                        alignSelf: 'flex-start',
+                        alignSelf: { xs: 'stretch', md: 'flex-start' },
                         background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
                         '&:hover': {
                           background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
                         },
+                        fontSize: { xs: '0.875rem', md: '0.875rem' },
                       }}
                     >
                       Export All Labels
@@ -178,23 +198,36 @@ const Settings = () => {
                   }}
                 >
                   <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
-                    <DownloadIcon sx={{ color: theme.palette.success.main }} />
-                    <Typography variant="h6">Import Labels</Typography>
+                    <DownloadIcon sx={{ color: theme.palette.success.main, fontSize: { xs: '1.25rem', md: '1.5rem' } }} />
+                    <Typography 
+                      variant="h6"
+                      sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}
+                    >
+                      Import Labels
+                    </Typography>
                   </Stack>
                   <Stack spacing={2}>
-                    <Typography variant="body2" sx={{ color: isDark ? theme.palette.text.secondary : theme.palette.grey[600] }}>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        color: isDark ? theme.palette.text.secondary : theme.palette.grey[600],
+                        fontSize: { xs: '0.8125rem', md: '0.875rem' },
+                      }}
+                    >
                       Import labels from a JSON file. The file should contain an array of label objects.
                     </Typography>
                     <Button
                       startIcon={<DownloadIcon />}
                       variant="contained"
                       onClick={() => setIsImportDialogOpen(true)}
+                      fullWidth={isMobile}
                       sx={{
-                        alignSelf: 'flex-start',
+                        alignSelf: { xs: 'stretch', md: 'flex-start' },
                         background: 'linear-gradient(135deg, #10b981, #059669)',
                         '&:hover': {
                           background: 'linear-gradient(135deg, #059669, #047857)',
                         },
+                        fontSize: { xs: '0.875rem', md: '0.875rem' },
                       }}
                     >
                       Import Labels

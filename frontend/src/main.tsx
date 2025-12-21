@@ -19,8 +19,12 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
+      // refetchOnMount will respect staleTime automatically
+      // If data is fresh (within staleTime), it won't refetch
+      // If data is stale, it will refetch
       retry: 1,
       staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
     },
   },
 });

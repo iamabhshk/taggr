@@ -11,6 +11,8 @@ const router = Router();
 
 // Health check
 router.get('/health', (req, res) => {
+  // Add cache headers for better performance
+  res.set('Cache-Control', 'public, max-age=60'); // Cache for 1 minute
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),

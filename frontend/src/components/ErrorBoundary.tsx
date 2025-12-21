@@ -78,7 +78,7 @@ class ErrorBoundary extends Component<Props, State> {
               We encountered an unexpected error. Don't worry, we're working on fixing it.
             </Typography>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {(import.meta.env.DEV || import.meta.env.MODE === 'development') && this.state.error && (
               <Box
                 sx={{
                   bgcolor: 'grey.100',
