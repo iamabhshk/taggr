@@ -10,7 +10,16 @@ interface WatchOptions {
 }
 
 export async function watchCommand(options: WatchOptions): Promise<void> {
-  const interval = options.interval || 30; // Default 30 seconds
+  // Validate and set interval
+  let interval = options.interval || 30; // Default 30 seconds
+  if (typeof interval !== 'number' || interval < 5) {
+    console.warn(chalk.yellow('Warning: Interval must be at least 5 seconds. Using 30 seconds.'));
+    interval = 30;
+  }
+  if (interval > 3600) {
+    console.warn(chalk.yellow('Warning: Interval is very large (>1 hour). Consider using a smaller value.'));
+  }
+  
   const spinner = ora('Starting watch mode...').start();
 
   try {
@@ -64,6 +73,10 @@ export async function watchCommand(options: WatchOptions): Promise<void> {
         const newLabels: string[] = [];
 
         for (const label of labels) {
+          // Validate label has required properties
+          if (!label || !label.name) {
+            continue; // Skip invalid labels
+          }
           const localMeta = currentMetadata.labels[label.name];
           if (!localMeta) {
             newLabels.push(label.name);
@@ -71,7 +84,7 @@ export async function watchCommand(options: WatchOptions): Promise<void> {
             outdated.push({
               name: label.name,
               oldVersion: localMeta.version,
-              newVersion: label.version,
+              newVersion: label.version || '1.0.0',
             });
           }
         }
@@ -122,11 +135,13 @@ export async function watchCommand(options: WatchOptions): Promise<void> {
           const pullSpinner = ora('Pulling updated labels...').start();
           try {
             await writeAllLabels(labels, config.apiUrl);
+            // Metadata is automatically updated by writeAllLabels
             pullSpinner.succeed(chalk.green('Labels updated successfully!'));
             console.log();
           } catch (error: any) {
             pullSpinner.fail(chalk.red('Failed to update labels'));
             console.error(chalk.red(`Error: ${error.message}`));
+            // Continue watching even if pull fails
           }
         } else {
           checkSpinner.succeed(chalk.dim('No changes detected'));

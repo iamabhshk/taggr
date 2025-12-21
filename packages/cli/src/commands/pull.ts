@@ -28,15 +28,23 @@ export async function pullCommand(name: string | undefined, options: PullOptions
       
       const { labels, count } = labelsResponse;
 
-      if (count === 0) {
+      if (count === 0 || !labels || labels.length === 0) {
         spinner.warn(chalk.yellow('No labels found.'));
         console.log(chalk.dim('Create labels at https://taggr.dev'));
         return;
       }
 
+      // Filter out invalid labels
+      const validLabels = labels.filter(label => label && label.name && label.value !== undefined);
+      if (validLabels.length === 0) {
+        spinner.warn(chalk.yellow('No valid labels found.'));
+        console.log(chalk.dim('All labels are missing required properties (name, value).'));
+        return;
+      }
+
       // Check for manual edits
       spinner.text = 'Checking for manual edits...';
-      const editCheck = await detectManualEdits(labels);
+      const editCheck = await detectManualEdits(validLabels);
       if (editCheck.isEdited) {
         spinner.warn(chalk.yellow('Manual edits detected'));
         console.log();
@@ -49,8 +57,8 @@ export async function pullCommand(name: string | undefined, options: PullOptions
         console.log();
       }
 
-      spinner.text = `Writing ${count} label(s)...`;
-      const files = await writeAllLabels(labels, config.apiUrl);
+      spinner.text = `Writing ${validLabels.length} label(s)...`;
+      const files = await writeAllLabels(validLabels, config.apiUrl);
 
       spinner.succeed(chalk.green(`Pulled ${count} label(s) successfully!`));
       console.log();
@@ -59,7 +67,7 @@ export async function pullCommand(name: string | undefined, options: PullOptions
         console.log(chalk.dim(`  ${file}`));
       }
       console.log();
-      printUsageInstructions(labels);
+      printUsageInstructions(validLabels);
     } else if (name) {
       // Pull single label
       spinner.text = `Fetching label "${name}"...`;

@@ -24,6 +24,8 @@ function toCamelCase(str: string): string {
  */
 function generateLabelsJson(labels: Label[]): string {
   const labelsObj: Record<string, string> = {};
+  const seenKeys = new Set<string>();
+  
   for (const label of labels) {
     // Validate label has required properties
     if (!label || !label.name || label.value === undefined) {
@@ -31,6 +33,14 @@ function generateLabelsJson(labels: Label[]): string {
       continue;
     }
     const key = toCamelCase(label.name);
+    
+    // Handle duplicate keys (same camelCase from different label names)
+    if (seenKeys.has(key)) {
+      console.warn(`Warning: Duplicate key "${key}" generated from label "${label.name}". Skipping.`);
+      continue;
+    }
+    seenKeys.add(key);
+    
     labelsObj[key] = String(label.value); // Ensure value is a string
   }
   return JSON.stringify(labelsObj, null, 2);

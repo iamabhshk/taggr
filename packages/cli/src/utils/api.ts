@@ -226,9 +226,16 @@ export async function getLabelVersions(): Promise<Record<string, string>> {
     // In the future, this could be a dedicated endpoint: /cli/labels/versions
     const response = await getLabels();
     
+    if (!response || !response.labels || !Array.isArray(response.labels)) {
+      throw new Error('Invalid response: labels array not found');
+    }
+    
     const versions: Record<string, string> = {};
     for (const label of response.labels) {
-      versions[label.name] = label.version;
+      // Only include labels with valid names and versions
+      if (label && label.name && typeof label.name === 'string') {
+        versions[label.name] = label.version || '1.0.0';
+      }
     }
     
     return versions;

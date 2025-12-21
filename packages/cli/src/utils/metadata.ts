@@ -17,7 +17,11 @@ function calculateChecksum(data: string): string {
  * Calculate checksum for a label value
  */
 function calculateLabelChecksum(label: Label): string {
-  const data = `${label.name}:${label.value}:${label.version}`;
+  // Ensure all required fields are present
+  const name = label.name || '';
+  const value = label.value !== undefined && label.value !== null ? String(label.value) : '';
+  const version = label.version || '1.0.0';
+  const data = `${name}:${value}:${version}`;
   return calculateChecksum(data);
 }
 
@@ -25,9 +29,16 @@ function calculateLabelChecksum(label: Label): string {
  * Calculate overall checksum for all labels
  */
 function calculateOverallChecksum(labels: Label[]): string {
-  const sortedLabels = [...labels].sort((a, b) => a.name.localeCompare(b.name));
+  const sortedLabels = [...labels]
+    .filter(label => label && label.name) // Filter out invalid labels
+    .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
   const data = sortedLabels
-    .map(label => `${label.name}:${label.value}:${label.version}`)
+    .map(label => {
+      const name = label.name || '';
+      const value = label.value !== undefined && label.value !== null ? String(label.value) : '';
+      const version = label.version || '1.0.0';
+      return `${name}:${value}:${version}`;
+    })
     .join('|');
   return calculateChecksum(data);
 }
@@ -41,11 +52,24 @@ export async function getMetadata(): Promise<TaggrMetadata | null> {
       const content = await fs.readJson(METADATA_FILE);
       // Validate structure
       if (content && typeof content === 'object' && !Array.isArray(content)) {
-        return content as TaggrMetadata;
+        // Additional validation: ensure required fields exist
+        if (typeof content.syncedAt === 'string' && 
+            typeof content.apiUrl === 'string' && 
+            content.labels && typeof content.labels === 'object') {
+          return content as TaggrMetadata;
+        } else {
+          console.warn(`Warning: Metadata file at ${METADATA_FILE} has invalid structure.`);
+          return null;
+        }
+      } else {
+        console.warn(`Warning: Metadata file at ${METADATA_FILE} is corrupted.`);
+        return null;
       }
     }
     return null;
-  } catch (error) {
+  } catch (error: any) {
+    // If file is corrupted, return null (will trigger re-sync)
+    console.warn(`Warning: Could not read metadata file: ${error.message}`);
     return null;
   }
 }
@@ -57,14 +81,27 @@ export async function saveMetadata(
   labels: Label[],
   apiUrl: string
 ): Promise<void> {
+  // Validate inputs
+  if (!labels || !Array.isArray(labels)) {
+    throw new Error('Labels must be a non-empty array');
+  }
+  if (!apiUrl || typeof apiUrl !== 'string') {
+    throw new Error('API URL must be a non-empty string');
+  }
+
   const now = new Date().toISOString();
   const labelMetadata: Record<string, LabelMetadata> = {};
 
   // Create metadata for each label
   for (const label of labels) {
+    // Validate label has required properties
+    if (!label || !label.name) {
+      console.warn(`Warning: Skipping invalid label in metadata: ${JSON.stringify(label)}`);
+      continue;
+    }
     const key = label.name;
     labelMetadata[key] = {
-      version: label.version,
+      version: label.version || '1.0.0',
       syncedAt: now,
       checksum: calculateLabelChecksum(label),
     };
@@ -91,6 +128,14 @@ export async function updateLabelMetadata(
   label: Label,
   apiUrl: string
 ): Promise<void> {
+  // Validate inputs
+  if (!label || !label.name) {
+    throw new Error('Label must have a name property');
+  }
+  if (!apiUrl || typeof apiUrl !== 'string') {
+    throw new Error('API URL must be a non-empty string');
+  }
+
   const existing = await getMetadata() || {
     syncedAt: new Date().toISOString(),
     apiUrl,
@@ -100,7 +145,7 @@ export async function updateLabelMetadata(
 
   const now = new Date().toISOString();
   existing.labels[label.name] = {
-    version: label.version,
+    version: label.version || '1.0.0',
     syncedAt: now,
     checksum: calculateLabelChecksum(label),
   };
@@ -168,15 +213,18 @@ export async function detectManualEdits(
     
     // Check for modified values
     for (const [labelName, labelMeta] of Object.entries(metadata.labels)) {
+      if (!labelName) continue; // Skip invalid keys
+      
       const label = labelMap.get(labelName);
       if (!label) continue;
       
       const camelKey = toCamelCase(labelName);
-      const expectedValue = String(label.value || '');
+      const expectedValue = String(label.value !== undefined && label.value !== null ? label.value : '');
       const actualValue = currentLabelsJson[camelKey];
       
       // If value in local file doesn't match expected value, it was manually edited
-      if (actualValue !== undefined && actualValue !== expectedValue) {
+      // But only if the version hasn't changed (version change means cloud update)
+      if (actualValue !== undefined && actualValue !== expectedValue && label.version === labelMeta.version) {
         differences.push(`"${labelName}" value changed (expected: "${expectedValue}", found: "${actualValue}")`);
       }
       

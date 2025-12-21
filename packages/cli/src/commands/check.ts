@@ -49,6 +49,11 @@ export async function checkCommand(options: CheckOptions): Promise<void> {
       spinner.text = 'Fetching current label versions...';
     }
     const remoteVersions = await getLabelVersions();
+    
+    // Validate remoteVersions
+    if (!remoteVersions || typeof remoteVersions !== 'object') {
+      throw new Error('Invalid response: label versions not found');
+    }
 
     // Compare local vs remote versions
     const outdated: OutdatedLabel[] = [];
