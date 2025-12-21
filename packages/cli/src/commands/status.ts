@@ -1,6 +1,8 @@
 import chalk from 'chalk';
-import { getMetadata } from '../utils/metadata.js';
+import { getMetadata, detectManualEdits } from '../utils/metadata.js';
 import { getOutputDir } from '../utils/generator.js';
+import { requireAuth } from '../utils/config.js';
+import { initApi, getLabels } from '../utils/api.js';
 import fs from 'fs-extra';
 import path from 'path';
 
@@ -76,6 +78,31 @@ export async function statusCommand(): Promise<void> {
       chalk.white('.taggr.json')
     );
     console.log();
+
+    // Check for manual edits
+    try {
+      const config = await requireAuth();
+      initApi(config);
+      const labelsResponse = await getLabels();
+      if (labelsResponse && labelsResponse.labels) {
+        const manualEdit = await detectManualEdits(labelsResponse.labels);
+        if (manualEdit.isEdited) {
+          console.log(chalk.bold('⚠ Integrity Check:'));
+          console.log();
+          console.log(chalk.yellow(`  Warning: ${manualEdit.reason || 'Labels file may have been manually edited'}`));
+          console.log();
+          console.log(chalk.dim('  Manual edits will be overwritten on next "taggr pull --all"'));
+          console.log();
+        } else {
+          console.log(chalk.bold('Integrity Check:'));
+          console.log();
+          console.log(chalk.green('  ✓ Labels file integrity verified'));
+          console.log();
+        }
+      }
+    } catch (error) {
+      // Silently fail if we can't check (e.g., not logged in)
+    }
   } catch (error: any) {
     console.error(chalk.red(`Error: ${error.message}`));
     process.exit(1);

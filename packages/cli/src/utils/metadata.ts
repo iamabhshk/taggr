@@ -123,6 +123,7 @@ export function getMetadataPath(): string {
 
 /**
  * Check if labels.json has been manually edited
+ * This compares the actual local file content with what should be there based on metadata
  */
 export async function detectManualEdits(
   labels: Label[]
@@ -130,6 +131,14 @@ export async function detectManualEdits(
   const metadata = await getMetadata();
   if (!metadata) {
     // No metadata means this might be a fresh install or manually created file
+    // If labels.json exists without metadata, it was likely manually created
+    const labelsJsonPath = path.join(OUTPUT_DIR, 'labels.json');
+    if (await fs.pathExists(labelsJsonPath)) {
+      return {
+        isEdited: true,
+        reason: 'Labels file exists but no sync metadata found. File may have been manually created.',
+      };
+    }
     return { isEdited: false };
   }
 
@@ -139,40 +148,73 @@ export async function detectManualEdits(
   }
 
   try {
+    // Read the actual local file
     const currentContent = await fs.readFile(labelsJsonPath, 'utf-8');
-    const currentLabels = JSON.parse(currentContent);
+    const currentLabelsJson: Record<string, string> = JSON.parse(currentContent);
     
-    // Check if any label in metadata is missing or changed
-    for (const [labelName, labelMeta] of Object.entries(metadata.labels)) {
-      const currentLabel = labels.find(l => l.name === labelName);
-      if (!currentLabel) {
-        // Label exists in metadata but not in current labels
-        // This could mean it was deleted manually
-        continue;
-      }
-
-      // Check if version changed (but this is expected on sync)
-      // We'll check checksum instead
-      const expectedChecksum = labelMeta.checksum;
-      const actualChecksum = calculateLabelChecksum(currentLabel);
-      
-      // If checksum doesn't match and it's not a version update, it was manually edited
-      if (expectedChecksum !== actualChecksum && currentLabel.version === labelMeta.version) {
-        return {
-          isEdited: true,
-          reason: `Label "${labelName}" has been manually modified`,
-        };
+    // Build expected labels from metadata and API labels
+    const expectedLabelsJson: Record<string, string> = {};
+    const labelMap = new Map<string, Label>();
+    for (const label of labels) {
+      if (label && label.name) {
+        labelMap.set(label.name, label);
+        const key = toCamelCase(label.name);
+        expectedLabelsJson[key] = String(label.value || '');
       }
     }
 
-    // Check overall checksum
-    const expectedOverall = metadata.overallChecksum;
-    const actualOverall = calculateOverallChecksum(labels);
+    // Compare local file with expected content
+    const differences: string[] = [];
     
-    if (expectedOverall && expectedOverall !== actualOverall) {
-      // This could be due to new labels or removed labels, not necessarily manual edits
-      // We'll be lenient here and only flag if we're sure
-      return { isEdited: false };
+    // Check for modified values
+    for (const [labelName, labelMeta] of Object.entries(metadata.labels)) {
+      const label = labelMap.get(labelName);
+      if (!label) continue;
+      
+      const camelKey = toCamelCase(labelName);
+      const expectedValue = String(label.value || '');
+      const actualValue = currentLabelsJson[camelKey];
+      
+      // If value in local file doesn't match expected value, it was manually edited
+      if (actualValue !== undefined && actualValue !== expectedValue) {
+        differences.push(`"${labelName}" value changed (expected: "${expectedValue}", found: "${actualValue}")`);
+      }
+      
+      // Check checksum to detect any other changes
+      const expectedChecksum = labelMeta.checksum;
+      const actualChecksum = calculateLabelChecksum(label);
+      
+      // If checksum doesn't match and version is the same, something was manually edited
+      if (expectedChecksum !== actualChecksum && label.version === labelMeta.version) {
+        if (!differences.some(d => d.includes(labelName))) {
+          differences.push(`"${labelName}" has been modified`);
+        }
+      }
+    }
+
+    // Check for extra labels in local file (manually added)
+    for (const [camelKey, value] of Object.entries(currentLabelsJson)) {
+      const found = Array.from(labelMap.values()).find(
+        l => toCamelCase(l.name || '') === camelKey
+      );
+      if (!found) {
+        differences.push(`Extra label "${camelKey}" found in local file (not in cloud)`);
+      }
+    }
+
+    // Check for missing labels (manually deleted)
+    for (const [labelName, labelMeta] of Object.entries(metadata.labels)) {
+      const camelKey = toCamelCase(labelName);
+      if (currentLabelsJson[camelKey] === undefined) {
+        differences.push(`Label "${labelName}" missing from local file (may have been deleted)`);
+      }
+    }
+
+    if (differences.length > 0) {
+      return {
+        isEdited: true,
+        reason: differences.slice(0, 3).join('; ') + (differences.length > 3 ? ` (and ${differences.length - 3} more)` : ''),
+      };
     }
 
     return { isEdited: false };
@@ -180,8 +222,21 @@ export async function detectManualEdits(
     // If we can't read or parse the file, assume it's been manually edited
     return {
       isEdited: true,
-      reason: 'Could not verify label integrity',
+      reason: 'Could not verify label integrity - file may be corrupted or manually edited',
     };
   }
+}
+
+/**
+ * Convert kebab-case to camelCase (helper for detectManualEdits)
+ */
+function toCamelCase(str: string): string {
+  if (!str || typeof str !== 'string') {
+    return '';
+  }
+  return str
+    .replace(/[^a-zA-Z0-9-]/g, '')
+    .replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())
+    .replace(/^[A-Z]/, (match) => match.toLowerCase());
 }
 
