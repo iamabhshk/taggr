@@ -35,5 +35,11 @@ jobs:
             exit 1
           fi
           taggr login $TAGGR_API_KEY
+          # Pull labels first to create metadata if it doesn't exist
+          if [ ! -f ".taggr.json" ]; then
+            echo "No sync metadata found. Pulling labels first..."
+            taggr pull --all
+          fi
+          # Check if labels are up-to-date
           taggr check --strict
 

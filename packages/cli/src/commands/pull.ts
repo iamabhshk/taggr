@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 import { requireAuth } from '../utils/config.js';
 import { initApi, getLabels, getLabelByName } from '../utils/api.js';
-import { writeLabelFile, writeAllLabels, updateIndexFile } from '../utils/generator.js';
+import { writeLabelFile, writeAllLabels } from '../utils/generator.js';
 import { detectManualEdits } from '../utils/metadata.js';
 import type { Label } from '../types.js';
 
@@ -82,15 +82,9 @@ export async function pullCommand(name: string | undefined, options: PullOptions
       spinner.text = 'Writing file...';
       const filePath = await writeLabelFile(label, config.apiUrl);
 
-      // Update files to include this label
-      const allLabelsResponse = await getLabels();
-      
-      if (!allLabelsResponse || !allLabelsResponse.labels) {
-        throw new Error('Invalid response from server: labels data not found');
-      }
-      
-      const { labels: allLabels } = allLabelsResponse;
-      await updateIndexFile(allLabels, config.apiUrl);
+      // Note: writeLabelFile already merges the label with existing labels.json
+      // and updates the TypeScript definitions. We only need to update metadata
+      // for this single label, which is already done by writeLabelFile.
 
       const labelName = label.name || 'label';
       spinner.succeed(chalk.green(`Pulled "${labelName}" successfully!`));
