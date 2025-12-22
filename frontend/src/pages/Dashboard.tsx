@@ -8,7 +8,6 @@ import {
   useTheme,
   Grid,
   Chip,
-  useMediaQuery,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -31,7 +30,6 @@ const Dashboard = () => {
   const [selectedLabel, setSelectedLabel] = useState<Label | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
 
   const {

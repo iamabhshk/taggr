@@ -7,7 +7,6 @@ import {
   Paper,
   useTheme,
   Chip,
-  useMediaQuery,
 } from '@mui/material';
 import {
   Email as EmailIcon,
@@ -27,7 +26,6 @@ import userService from '@/services/userService';
 const Profile = () => {
   const { user, isLoading } = useAuth();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isDark = theme.palette.mode === 'dark';
   const cardBg = isDark ? theme.palette.background.paper : '#ffffff';
   const textColor = isDark ? theme.palette.text.primary : theme.palette.grey[800];
