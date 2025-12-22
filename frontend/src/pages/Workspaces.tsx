@@ -325,14 +325,17 @@ const Workspaces = () => {
                   >
                     {currentWorkspace?._id !== workspace._id && (
                       <Button
-                        size="small"
                         variant="outlined"
                         onClick={(e) => {
                           e.stopPropagation();
                           setCurrentWorkspace(workspace);
                           enqueueSnackbar(`Switched to ${workspace.name}`, { variant: 'info' });
                         }}
-                        sx={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}
+                        sx={{ 
+                          fontSize: { xs: '0.875rem', md: '0.875rem' },
+                          px: { xs: 2, md: 2.5 },
+                          py: { xs: 0.75, md: 1 },
+                        }}
                       >
                         Switch
                       </Button>
@@ -370,9 +373,12 @@ const Workspaces = () => {
                 variant="outlined"
                 startIcon={<InviteIcon />}
                 onClick={() => setIsInviteOpen(true)}
-                size="small"
                 fullWidth={isMobile}
-                sx={{ minWidth: { xs: '100%', md: 'auto' } }}
+                sx={{ 
+                  minWidth: { xs: '100%', md: 'auto' },
+                  px: { xs: 2, md: 2.5 },
+                  py: { xs: 0.75, md: 1 },
+                }}
               >
                 Invite Member
               </Button>

@@ -111,7 +111,7 @@ const Dashboard = () => {
             onRetry={() => refetchStats()}
           />
         ) : (
-        <Grid container spacing={1.5}>
+        <Grid container spacing={1.5} justifyContent="center">
           {[
             {
               label: 'TOTAL LABELS',
